@@ -1,0 +1,71 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+:root {
+  --primary-color: #085db7;
+  --secondary-color: #f7f8f9;
+  --accent-color: #f1592a;
+  --gray-color: #6a7282;
+  --black-color: #000000;
+  --white-color: #ffffff;
+}
+
+:root {
+  --bg-page: #f7f9fc;
+  --bg-card: #ffffff;
+
+  --primary: #085db7;
+  --primary-hover: #1d4ed8;
+
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+
+  --border-default: #e2e8f0;
+
+  --error-bg: #fff1f2;
+  --error-border: #fecdd3;
+  --error-text: #e11d48;
+}
+
+
+
+.inter {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.exo-2 {
+  font-family: "Exo 2", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  background-color: var(--secondary-color);
+}
+
+/* Scrollbar Width */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Scrollbar Track */
+::-webkit-scrollbar-track {
+  background: #111111;
+}
+
+/* Scrollbar Thumb */
+::-webkit-scrollbar-thumb {
+  background: #6a7282;
+  transition: 0.3s;
+}
+
+/* Hover Effect */
+::-webkit-scrollbar-thumb:hover {
+  background: #085db7;
+}
