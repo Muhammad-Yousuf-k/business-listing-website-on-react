@@ -1,134 +1,232 @@
-import Btnone from "../components/small compo/Btn-one"
-import Btntwo from "../components/small compo/Btn-two"
-import ListingCard from "../components/ListingCard"
-import How_it_work_card from "../components/How_it_work_card"
-import { useState } from "react"
+import { useState, useMemo } from "react"
+import { useNavigate } from "react-router-dom"
+import ButtonOne from "../components/ButtonOne"
+import ButtonTwo from "../components/ButtonTwo"
+import RestaurantCard from "../components/RestaurantCard"
+import StepCard from "../components/StepCard"
+import ReviewCard from "../components/ReviewCard"
+import CommonCta from "../components/CommonCta"
+import Icon from "../components/Icon"
+import { useRestaurant } from "../hooks/useRestaurant"
 
-const home = () => {
 
-    const [searchEat, setSearchEat] = useState("")
-    const [searchState, setSearchState] = useState("")
+/* ─── Section Heading ────────────────────────────────────────── */
+const SectionHeading = ({ label, title }) => (
+  <div className="flex flex-col items-center gap-2 text-center">
+    <span className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full" style={{ backgroundColor: "rgba(241,89,42,0.1)", color: "var(--accent-color)" }}>
+      {label}
+    </span>
+    <h2 className="exo-2 text-3xl sm:text-5xl font-bold text-(--black-color)">{title}</h2>
+  </div>
+)
 
 
+/* ─── Main Home Page ─────────────────────────────────────────── */
+const HomePage = () => {
+  const { listing: fetch_restaurants, reviews } = useRestaurant()
+  const navigate = useNavigate()
 
-    return (
-        <>
-            <main className="min-h-250">
-                {/* hero Sec */}
+  const [searchEat, setSearchEat] = useState("")
+  const [searchState, setSearchState] = useState("")
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const restaurants = useMemo(() => fetch_restaurants?.restaurants ?? [], [fetch_restaurants?.restaurants]);
 
-                <div style={{ background: 'radial-gradient(circle, #F1592A, #000000)' }} className="hero_sec sm:min-h-[85vh] pb-5 flex justify-center items-center flex-col gap-5">
-                    <div className="top_sec w-[90%] min-h-[20vh] flex justify-center items-center flex-col gap-2">
-                        <h1 className="exo-2 text-[var(--secondary-color)] text-4xl sm:text-6xl font-bold text-center">
-                            <span className="text-[var(--accent-color)]">Rank Eats</span> Where you find visibility
-                        </h1>
-                        <p className="text-[var(--secondary-color)] text-center w-[95%] sm:w-[75%] text-[13px] sm:text-xl">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum cum iure soluta dolores assumenda. Ullam obcaecati cupiditate rem aliquam quam aut placeat recusandae, nemo, quibusdam rerum odio aperiam aliquid ut!
-                        </p>
-                    </div>
+  const handleSearch = async () => {
+    setIsSubmitted(true)
+    const queryString = `q=${encodeURIComponent(searchEat)}&q1=${encodeURIComponent(searchState)}&source=double`;
+    navigate(`/search/?${queryString}`)
+    setIsSubmitted(false)
 
-                    <div className="middle_sec w-[95%] min-h-[20vh] flex justify-center items-center flex-col gap-2 sm:gap-2">
-                        <h1 className="exo-2 text-[var(--secondary-color)] text-xl sm:text-4xl font-bold">Find The Best, Eat The Best</h1>
-                        <div className="listing_search_box flex flex-col gap-2">
-                            <div className="listing_search min-h-[15vh] flex justify-center items-center flex-wrap">
-                                <h2 className="exo-2 text-[var(--secondary-color)] bg-[var(--primary-color)] flex justify-center items-center h-[40px] w-[40px] sm:h-[60px] sm:w-[60px] text-center text-[13px] sm:text-xl">Find</h2>
-                                <input value={searchEat} onChange={(e) => setSearchEat(e.target.value)} className="bg-[var(--secondary-color)] h-[40px] sm:h-[59px] w-[160px] sm:w-fit rounded-none p-[0%] pl-1 text-[4]" type="text" placeholder="pizza, steaks, french Fries" />
-                                <h2 className="exo-2 text-[var(--secondary-color)] bg-[var(--primary-color)] flex justify-center items-center h-[40px] w-[40px] sm:h-[60px] sm:w-[60px] text-center text-[13px] sm:text-xl">in</h2>
-                                <input value={searchState} onChange={(e) => setSearchState(e.target.value)} className="bg-[var(--secondary-color)] h-[40px] sm:h-[59px] w-[240px] sm:w-fit rounded-none p-[0%] pl-1 text-[4]" type="text" placeholder="City or State" />
-                                <button className="exo-2 text-[var(--secondary-color)] bg-[var(--primary-color)] flex justify-center items-center h-[40px] w-[240px] sm:h-[60px] sm:w-[60px] text-center text-[13px] sm:text-xl">icon</button>
-                            </div>
-                            <div className="flex justify-center items-center gap-5">
-                                <Btntwo text={"Restaurant Eats"} path={"/"} />
-                                <Btnone text={"Restaurant"} path={"/"} />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {/* Wellcome Sec  */}
-                <div className="wellcome_banner_box bg-(--primary-color) min-h-[250px] pb-5 flex justify-center items-center flex-col gap-5 pt-[30px] pb-[30px]">
-                    <div className="wellcome_banner w-[90%]  flex flex-col sm:flex-row justify-between items-start">
-                        <h1 className="exo-2 text-(--secondary-color) text-4xl sm:text-5xl font-bold w-full sm:w-[40%]">Rank Eats Where you find visibility</h1>
-                        <p className="text-(--secondary-color) text-[15px] w-full sm:w-[60%]">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo a nisi odit facilis quidem eum maxime consequuntur, dolor, expedita, fugiat quibusdam. Fuga ratione suscipit est doloremque culpa consectetur quam aspernatur. Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum neque dolore sint pariatur quae, beatae eum, earum numquam ut alias voluptatem. Quis architecto ex saepe neque nesciunt labore optio tempore?</p>
-                    </div>
-                </div>
-                {/* about Sec  */}
-                <div className="feauture_restaurants_box min-h-[250px] flex flex-col justify-center items-center gap-5 pt-[50px] pb-[50px]">
-                    <div className="feauture_restaurants w-[90%]  flex flex-col sm:flex-row justify-between items-start gap-10 sm:gap-10">
+  }
 
-                        <div className="feauture_restaurants_left relative w-full  sm:w-1/2">
-                            <img className=" w-[100%] h-[300px] sm:w-[500px] sm:h-[500px] rounded" src="/login-banner.png" alt="" />
-                            <img className=" w-[70%] h-[150px] md:w-[400px] md:h-[300px]  rounded absolute bottom-[-30px] right-0" src="/aboutimg1.png" alt="" />
-                        </div>
-                        <div className="feauture_restaurants_right w-full  sm:w-1/2 flex flex-col gap-5">
-                            <h1 className="exo-2 text-(--black-color) text-4xl sm:text-5xl font-bold ">Rank Eats Where you find visibility</h1>
-                            <p className="text-gray-600 text-[15px] ">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo a nisi odit facilis quidem eum maxime consequuntur, dolor, expedita, fugiat quibusdam. Fuga ratione suscipit est doloremque culpa consectetur quam aspernatur. Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum neque dolore sint pariatur quae, beatae eum, earum numquam ut alias voluptatem. Quis architecto ex saepe neque nesciunt labore optio tempore?</p>
-                            <p className="text-gray-600 text-[15px] ">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo a nisi odit facilis quidem eum maxime consequuntur, dolor, expedita, fugiat quibusdam. Fuga ratione suscipit est doloremque culpa consectetur quam aspernatur. Lorem ipsum dolor sit amet consectetur adipisicing elit. Laborum neque dolore sint pariatur quae, beatae eum, earum numquam ut alias voluptatem. Quis architecto ex saepe neque nesciunt labore optio tempore?</p>
 
-                        </div>
-                    </div>
-                </div>
-                {/* How It Work Sec  */}
-                <div className="best_restaurants_box min-h-[100vh] flex justify-center items-start gap-5 pt-[50px] pb-[50px]">
-                    <div className="best_restaurantsw-[100%] lg:w-[90%] p-2">
-                        <div className="top_sec_heading_box flex justify-center items-center relative">
-                            <h1 className="exo-2 absolute text-8xl font-bold text-[#EAEAED] z-0 bottom-0 ">How It Work</h1>
-                            <h1 className="exo-2 text-6xl text-(--primary-color) font-bold z-10 bottom-0">How It Work</h1>
-                        </div>
-                        <div className="middle_sec_card_box w-full flex justify-center items-center flex-wrap gap-3 mt-10">
-                            <How_it_work_card data={{
-                                logo: "search",
-                                name: "Search Eats",
-                                para: "Create your account and provide basic information about your restaurant."
-                            }} />
-                            <How_it_work_card data={{
-                                logo: "cooking",
-                                name: "Enjoy!",
-                                para: "Add detailed information about your restaurant, including menu items and photos."
-                            }} />
-                            <How_it_work_card data={{
-                                logo: "vote",
-                                name: "Vote",
-                                para: "Complete the verification process to ensure your listing is accurate and trustworthy."
-                            }} />
-                            <How_it_work_card data={{
-                                logo: "star",
-                                name: "Review",
-                                para: "Complete the verification process to ensure your listing is accurate and trustworthy."
-                            }} />
-                        </div>
+  // const reviews = [
+  //   { author: "Sarah M.", restaurant: "The Flame House", rating: 5, text: "Absolutely incredible ribs. Found this gem through Rank Eats and it's now my go-to spot every weekend. The ranking system really works!", avatar: "SM" },
+  //   { author: "James K.", restaurant: "Sakura Garden", rating: 5, text: "Rank Eats helped me discover restaurants I never would have found otherwise. The reviews are genuine and the ranking is trustworthy.", avatar: "JK" },
+  //   { author: "Priya N.", restaurant: "Spice Route", rating: 4, text: "Love that I can vote for my favorite places. The community here really knows their food. Found three new favorites this month alone.", avatar: "PN" },
+  //   { author: "Sarah M.", restaurant: "The Flame House", rating: 5, text: "Absolutely incredible ribs. Found this gem through Rank Eats and it's now my go-to spot every weekend. The ranking system really works!", avatar: "SM" },
+  //   { author: "James K.", restaurant: "Sakura Garden", rating: 5, text: "Rank Eats helped me discover restaurants I never would have found otherwise. The reviews are genuine and the ranking is trustworthy.", avatar: "JK" },
+  //   { author: "Priya N.", restaurant: "Spice Route", rating: 4, text: "Love that I can vote for my favorite places. The community here really knows their food. Found three new favorites this month alone.", avatar: "PN" },
+  // ]
 
-                    </div>
-                </div>
-                {/* Top Ranked Restaurants Sec  */}
-                <div className="best_restaurants_box min-h-[100vh] flex justify-center items-start gap-5 pt-[50px] pb-[50px]">
-                    <div className="best_restaurants w-[100%] lg:w-[90%] p-2">
-                        <div className="top_sec_heading_box flex justify-center items-center relative">
-                            <h1 className="exo-2 absolute text-5xl sm:text-8xl font-bold text-[#EAEAED] z-0 bottom-0 ">Top Ranked Restaurants</h1>
-                            <h1 className="exo-2 text-3xl sm:text-6xl text-(--primary-color) font-bold z-10 bottom-0">Best Restaurants</h1>
-                        </div>
-                        <div>
-                            {/*  */}
-                        </div>
-                        <div className="middle_sec_card_box w-full flex justify-center items-center flex-wrap gap-3 mt-10">
-                            {[1, 2, 3, 4, 5, 6].map((item) => {
-                                return <ListingCard key={item} />
-                            })}
-                        </div>
+  return (
+    <main className="bg-(--secondary-color) min-h-full">
+      <style>{`
+        
+        .search-input { background: rgba(255,255,255,0.06); border: 1.5px solid rgba(255,255,255,0.1); color: #f0f0f0; border-radius: 10px; padding: 12px 16px; font-size: 15px; outline: none; transition: border-color 0.15s, background 0.15s; font-family: inherit; }
+        .search-input::placeholder { color: rgba(255,255,255,0.3); }
+        .search-input:focus { border-color: var(--accent-color); background: rgba(255,255,255,0.09); }
+        
+        
+        .check-icon { background: rgba(241,89,42,0.15); flex-shrink: 0; }
+      `}</style>
 
-                    </div>
-                </div>
-                {/* Latest Reviews Sec  */}
-                <div className="best_restaurants_box min-h-[100vh] flex justify-center items-start gap-5 pt-[50px] pb-[50px]">
-                    <div className="best_restaurants w-[90%] p-2">
-                        <div className="top_sec_heading_box flex justify-center items-center relative">
-                            <h1 className="exo-2 absolute text-8xl font-bold text-[#EAEAED] z-0 bottom-0 ">Latest Reviews</h1>
-                            <h1 className="exo-2 text-6xl text-(--primary-color) font-bold z-10 bottom-0">Latest Reviews</h1>
-                        </div>
+      {/* ── HERO ──────────────────────────────────────────────── */}
+      <section
+        className="  relative flex  flex-col items-center justify-center text-center px-4 pt-24 pb-20 gap-8 overflow-hidden"
+        style={{ minHeight: "90vh", background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(241,89,42,0.25) 0%, transparent 65%), #0d0d0d" }}
+      >
+        {/* subtle grid texture */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize: "60px 60px", zIndex: 0 }}
+        />
 
-                    </div>
-                </div>
-            </main>
-        </>
-    )
+        <div className="relative z-10 flex flex-col items-center gap-6 max-w-4xl">
+
+
+          <h1 className="exo-2 font-bold leading-tight" style={{ fontSize: "clamp(2.4rem, 6vw, 4.5rem)", color: "#f0f0f0" }}>
+            <span style={{ color: "var(--accent-color)" }}>Rank Eats</span> Where Every{" "}
+            <span style={{ color: "#f0f0f0" }}>Bite</span> Gets{" "}
+            <span style={{ color: "#f0f0f0" }}>Noticed</span>
+          </h1>
+
+          <p className="text-base sm:text-lg leading-relaxed max-w-xl" style={{ color: "var(--text-muted)" }}>
+            Discover, vote, and review the best restaurants in your city. Powered by the community — not ad budgets.
+          </p>
+
+          {/* Search Bar */}
+          <div
+            className="w-full max-w-3xl rounded-2xl p-3 flex flex-col sm:flex-row gap-2"
+            style={{ backgroundColor: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)" }}
+          >
+            <div className="flex items-center gap-2 flex-1" style={{ backgroundColor: "rgba(255,255,255,0.05)", borderRadius: "10px", padding: "0 14px" }}>
+              <Icon name="search" size={16} />
+              <input
+                className="search-input flex-1"
+                style={{ background: "transparent", border: "none", padding: "12px 4px" }}
+                value={searchEat}
+                onChange={e => setSearchEat(e.target.value)}
+                placeholder="Pizza, steaks, ramen..."
+              />
+            </div>
+            <div className="flex items-center gap-2 flex-1" style={{ backgroundColor: "rgba(255,255,255,0.05)", borderRadius: "10px", padding: "0 14px" }}>
+              <Icon name="mapPin" size={16} />
+              <input
+                className="search-input flex-1"
+                style={{ background: "transparent", border: "none", padding: "12px 4px" }}
+                value={searchState}
+                onChange={e => setSearchState(e.target.value)}
+                placeholder="City or state..."
+              />
+            </div>
+            <ButtonTwo onClick={handleSearch} title={"Search"} icon={"left"} iconName={"search"} iconSize={15} isSubmitted={isSubmitted} isSubmittedText={"Searching..."} />
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-3">
+            <ButtonOne path="/search/?q=all-restaurants&source=single" title={"Browse Restaurants"} isInverted={true} />
+            <ButtonTwo path="/search/?q=top-eats&source=single" title={"Top Ranked Eats"} icon={"left"} iconName={"trophy"} iconSize={15} />
+          </div>
+        </div>
+
+
+      </section>
+
+      {/* ── WELCOME BANNER ────────────────────────────────────── */}
+      <section
+        className="px-4 py-16"
+        style={{ backgroundColor: "var(--primary-color)" }}
+      >
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-8">
+          <h2 className="exo-2 font-bold text-3xl sm:text-5xl text-white w-full sm:w-[44%] leading-tight">
+            Find The Best.<br />Eat The Best.
+          </h2>
+          <div className="w-full sm:w-[52%] flex flex-col items-start gap-4">
+            <p className="text-base leading-relaxed" style={{ color: "rgba(255,255,255,0.85)" }}>
+              Rank Eats puts real community votes at the center of every restaurant ranking. No pay-to-win listings — just honest reviews from people who actually ate there.
+            </p>
+            <ButtonTwo path="/#process" title={"Learn how it works"} icon={"right"} iconName={"arrowRight"} iconSize={15} />
+          </div>
+        </div>
+      </section>
+
+      {/* ── ABOUT / FEATURES ──────────────────────────────────── */}
+      <section className="max-w-6xl mx-auto px-4 py-20 flex flex-col sm:flex-row gap-12 sm:gap-16 items-center">
+        {/* Visual side */}
+        <div className="feauture_restaurants_left relative w-full  sm:w-1/2">
+          <img className=" w-[100%] h-[300px] sm:w-[500px] sm:h-[500px] rounded" src="/login-banner.png" alt="" />
+          <img className=" w-[70%] h-[150px] md:w-[400px] md:h-[300px]  rounded absolute bottom-[-30px] right-0" src="/aboutimg1.png" alt="" />
+        </div>
+
+        {/* Text side */}
+        <div className="w-full sm:w-1/2 flex flex-col items-start gap-6">
+          <span className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full self-start" style={{ backgroundColor: "rgba(241,89,42,0.1)", color: "var(--accent-color)" }}>
+            About Rank Eats
+          </span>
+          <h2 className="exo-2 font-bold text-3xl sm:text-4xl leading-snug text-(--black-color)">
+            Visibility Earned, Not Bought
+          </h2>
+          <p className="text-sm leading-relaxed text-(--gray-color)" >
+            Rank Eats is built on a simple belief: the best restaurants should rise to the top because of what's on the plate — not what's in the marketing budget. Our community of food lovers votes, reviews, and ranks every listing.
+          </p>
+
+          <div className="flex flex-col gap-3">
+            {[
+              "Community-driven rankings, updated in real time",
+              "Verified restaurant listings with honest reviews",
+              "Vote for your favorites and shape what gets discovered",
+              "Completely free basic listings for every restaurant",
+            ].map((item, i) => (
+              <div key={i} className="flex items-start gaps-[10px]">
+                <span className="check-icon w-[20px] h-[20px] rounded-[50%] flex items-center justify-center shrink-0 text-(--accent-color) mt-[1px]"><Icon name="check" size={11} /></span>
+                <span className="text-sm leading-relaxed text-(--gray-color)">{item}</span>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── HOW IT WORKS ──────────────────────────────────────── */}
+      <section id="process" className="px-4 py-20 bg-(--secondary-color)" >
+        <div className="max-w-6xl mx-auto flex flex-col gap-12">
+          <SectionHeading label="The Process" title="How It Works" />
+          <div className="flex flex-wrap gap-4 justify-center">
+            <StepCard step={1} icon="search" title="Search Eats" desc="Type any food, cuisine, or restaurant name and narrow it down by city or state." />
+            <StepCard step={2} icon="star" title="Read Reviews" desc="Browse real community reviews with verified ratings from actual diners." />
+            <StepCard step={3} icon="vote" title="Cast Your Vote" desc="Vote for your favorite spots and help push the best restaurants to the top of the list." />
+            <StepCard step={4} icon="cooking" title="Enjoy the Best" desc="Discover new places with confidence — ranked by people who genuinely love food." />
+          </div>
+        </div>
+      </section>
+
+      {/* ── TOP RANKED RESTAURANTS ────────────────────────────── */}
+      <section className="px-4 py-20 bg-(--secondary-color)">
+        <div className="max-w-6xl mx-auto flex flex-col gap-12">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <SectionHeading label="Community Favorites" title="Best Restaurants" />
+            <ButtonOne path="/search/?q=all-restaurants&source=single" title={"View All"} icon={true} />
+          </div>
+          <div className="flex flex-wrap gap-5 justify-center">
+            {restaurants?.map((e, idx) => (
+              <RestaurantCard key={idx} data={e} />
+
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── LATEST REVIEWS ────────────────────────────────────── */}
+      <section className="px-4 py-20 bg-(--secondary-color)">
+        <div className="max-w-6xl mx-auto flex flex-col gap-12">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <SectionHeading label="What People Are Saying" title="Latest Reviews" />
+            <ButtonOne path="/search/?q=all-reviews&source=single" title={"All Reviews"} icon={true} />
+
+          </div>
+          <div className="flex flex-wrap gap-5 justify-center">
+            {reviews.map((r, i) => (
+              <ReviewCard key={i} {...r} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA FOOTER BANNER ─────────────────────────────────── */}
+      <CommonCta />
+
+    </main>
+  )
 }
 
-export default home
+export default HomePage

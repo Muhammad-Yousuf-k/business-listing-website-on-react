@@ -11,12 +11,16 @@ const Icon = ({ name, size = 20 }) => {
 };
 
 
-const CommonHeroSec = ({pageName = "page Name", heading = "heading", para = ""}) => {
+const CommonHeroSec = ({ pageName = "page Name", heading = "heading", para = "" }) => {
     return (
         <div
             className="relative overflow-hidden"
-            style={{ background: "linear-gradient(135deg, #000000 0%, #040814 60%, #30333b 100%)", paddingTop: "72px", paddingBottom: "72px" }}
+            style={{ background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(241,89,42,0.25) 0%, transparent 65%), #0d0d0d", paddingTop: "72px", paddingBottom: "72px" }}
         >
+            <div
+                className="absolute inset-0 pointer-events-none"
+                style={{ backgroundImage: "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)", backgroundSize: "60px 60px", zIndex: 0 }}
+            />
             {/* Decorative circles */}
             <div className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-10" style={{ background: "radial-gradient(circle, #F1592A, transparent)", transform: "translate(30%, -30%)" }} />
             <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full opacity-10" style={{ background: "radial-gradient(circle, #F1592A, transparent)", transform: "translate(-30%, 30%)" }} />

@@ -23,6 +23,8 @@ import Header from "../../components/dashboardCompo/Header.jsx";
 import Sidebar from "../../components/dashboardCompo/Sidebar";
 import { Listing_Form_validator } from "../../validator/listing_form_verify.js";
 import { useRestaurant } from "../../hooks/useRestaurant.js";
+// ─── Constants ───────────────────────────────────────────────────────────────
+import { RESTAURANT_CATEGORIES, FOOD_CATEGORIES } from "../../constant/RESTAURANT_CONSTANT.js";
 
 import FieldLabel from "../../components/form_small_compo/FieldLabel";
 import FieldInput from "../../components/form_small_compo/FieldInput";
@@ -31,27 +33,7 @@ import FieldTextarea from "../../components/form_small_compo/FieldTextarea";
 import SectionCard from "../../components/form_small_compo/SectionCard";
 import SectionTitle from "../../components/form_small_compo/SectionTitle";
 import SubText from "../../components/form_small_compo/SubText";
-// ─── Constants ───────────────────────────────────────────────────────────────
 
-
-const FOOD_CATEGORIES = [
-  "Burgers", "Pizza", "Fried Chicken", "Hot Dogs", "Sandwiches", "BBQ",
-  "Steaks", "Seafood", "Pasta", "Mexican Food", "Tacos", "Burritos",
-  "Chinese Food", "Sushi", "Ramen", "Thai Food", "Korean Food", "Indian Food",
-  "Breakfast", "Brunch", "Diners", "Salads", "Healthy Food", "Vegan Food",
-  "Vegetarian Food", "Bakery", "Desserts", "Ice Cream", "Coffee", "Juices",
-  "Mediterranean Food", "Middle Eastern Food", "French Food",
-];
-
-const RESTAURANT_CATEGORIES = [
-  "Burgers", "Fried Chicken", "Pizza", "Hot Dogs", "Sandwiches", "BBQ",
-  "Steakhouses", "Southern Food", "Soul Food", "Comfort Food", "Italian",
-  "Mexican", "Tex Mex", "Latin American", "Chinese", "Japanese", "Thai",
-  "Korean", "Indian", "Cafes", "Diners", "Brunch", "Breakfast", "Vegan",
-  "Vegetarian", "Organic", "Healthy Food", "Bakery", "Desserts", "Ice Cream",
-  "Coffee Shops", "Juice Bars", "Donuts", "Seafood", "Mediterranean",
-  "Middle Eastern", "French", "African", "Fine Dining", "Luxury Dining",
-];
 
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -389,31 +371,32 @@ const CreateListing = () => {
     setForm((prev) => ({ ...prev, images: prev.images.filter((_, i) => i !== idx) }));
 
   const handleSubmit = async () => {
-
-    const payload = {
-      ...form,
-      tags,
-      features,
-    };
-
-    const Form_validator_result = Listing_Form_validator(payload)
-
-    if (Form_validator_result !== null) {
-      toast.error(Form_validator_result);
-      return
-    }
-
-    await createRestaurant(payload)
-    navigate("/owner/dashboard");
+    setIsSubmitting(true)
     try {
-      toast.success("try");
+
+      const payload = {
+        ...form,
+        tags,
+        features,
+      };
+
+      const Form_validator_result = Listing_Form_validator(payload)
+
+      if (Form_validator_result !== null) {
+        toast.error(Form_validator_result);
+        return
+      }
+
+      const res = await createRestaurant(payload)
+      if (res) {
+        navigate("/owner/dashboard");
+      }
 
 
     } catch (err) {
-      toast.error(err.message || "Login failed");
+      toast.error("listing failed");
     } finally {
-      console.log("finally");
-
+      setIsSubmitting(false)
     }
   };
 

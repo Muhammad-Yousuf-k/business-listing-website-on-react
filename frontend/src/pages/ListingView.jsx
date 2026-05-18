@@ -1,4 +1,9 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useRestaurant } from "../hooks/useRestaurant"
+import { useParams, Link } from "react-router-dom"
+import { useEffect } from "react";
+import ButtonOne from "../components/ButtonOne";
+import ReviewModal from "../components/ReviewModal";
 
 /* ─── Mock Data ─────────────────────────────────────────────── */
 const listing = {
@@ -7,7 +12,7 @@ const listing = {
   rating: 4.7,
   reviewCount: 284,
   priceRange: "$$$",
-  coverImage: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=80",
+  coverImage: "",
   description:
     "The Golden Fork is an award-winning Italian fine dining restaurant nestled in the heart of downtown. Our executive chef crafts each dish using locally sourced ingredients and time-honored recipes passed down through generations. From hand-rolled pasta to wood-fired pizzas, every bite tells a story of passion and craftsmanship. We take pride in delivering an unforgettable dining experience with warm hospitality and an unrivalled wine selection.",
   address: {
@@ -30,14 +35,7 @@ const listing = {
     { day: "Saturday", open: "10:00 AM", close: "12:00 AM", closed: false },
     { day: "Sunday", open: "10:00 AM", close: "9:00 PM", closed: false },
   ],
-  gallery: [
-    "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80",
-    "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80",
-    "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=80",
-    "https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=600&q=80",
-    "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=600&q=80",
-    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80",
-  ],
+  gallery: [],
   menu: [
     {
       category: "Starters",
@@ -106,9 +104,9 @@ const listing = {
     },
   ],
   related: [
-    { name: "Casa Bella", category: "Italian · Casual", rating: 4.3, image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&q=80" },
-    { name: "Trattoria Napoli", category: "Pizza · Family", rating: 4.5, image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80" },
-    { name: "Il Piccolo", category: "Fine Dining · Wine Bar", rating: 4.6, image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80" },
+    { name: "Casa Bella", category: "Italian · Casual", rating: 4.3, image: "" },
+    { name: "Trattoria Napoli", category: "Pizza · Family", rating: 4.5, image: "" },
+    { name: "Il Piccolo", category: "Fine Dining · Wine Bar", rating: 4.6, image: "" },
   ],
 };
 
@@ -151,10 +149,12 @@ const Stars = ({ rating, size = 14 }) => (
 );
 
 /* ─── Section Wrapper ────────────────────────────────────────── */
-const Section = ({ id, title, children }) => (
+const Section = ({ id, title, children, isBtn = false, handeReviewModel }) => (
   <section id={id} className="rounded-2xl p-6 sm:p-8" style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border-default)" }}>
-    <h2 className="text-xl font-bold mb-5 pb-4" style={{ color: "var(--text-main)", borderBottom: "1px solid var(--border-default)", fontFamily: "'Sora', sans-serif" }}>
+    <h2 className="text-xl font-bold mb-5 pb-4 flex justify-between items-center" style={{ color: "var(--text-main)", borderBottom: "1px solid var(--border-default)", fontFamily: "'Sora', sans-serif" }}>
       {title}
+      {isBtn && <ButtonOne onClick={handeReviewModel} title="write Review" />}
+
     </h2>
     {children}
   </section>
@@ -169,9 +169,29 @@ const InfoCard = ({ children }) => (
 
 /* ─── Main Component ─────────────────────────────────────────── */
 function ListingView() {
+  const {
+    get_restaurantById,
+    listing: fetchRestaurant,
+    saveListing,
+  } = useRestaurant()
+  const { _id } = useParams();
   const [activeMenu, setActiveMenu] = useState("Starters");
   const [lightbox, setLightbox] = useState(null);
+  const [reviewModel, setReviewModel] = useState(false);
   const today = new Date().toLocaleDateString("en-US", { weekday: "long" });
+  const restaurant = useMemo(() => fetchRestaurant?.restaurant ?? [], [fetchRestaurant?.restaurant]);
+  const workingHours = restaurant?.data?.workingHours || {}
+  const restaurantImage = restaurant?.data?.images || ["/aboutimg1.png"]
+
+  useEffect(() => {
+    get_restaurantById(_id)
+    console.log(restaurant);
+
+  }, [_id])
+
+
+
+
 
   return (
     <div style={{ backgroundColor: "var(--bg-page)", fontFamily: "'DM Sans', sans-serif", minHeight: "100vh" }}>
@@ -200,7 +220,7 @@ function ListingView() {
 
       {/* ── Hero / Cover ── */}
       <div className="relative w-full" style={{ height: "380px", overflow: "hidden" }}>
-        <img src={listing.coverImage} alt={listing.name} className="w-full h-full object-cover" />
+        <img src={restaurantImage[0] ? restaurantImage[0] : "/aboutimg1.png"} alt={restaurant?.data?.name} className="w-full h-full object-cover" />
         <div className="absolute inset-0" style={{ background: "linear-gradient(to bottom, rgba(15,23,42,0.25) 0%, rgba(15,23,42,0.72) 100%)" }} />
         {/* Breadcrumb */}
         <div className="absolute top-5 left-5 sm:left-10 flex items-center gap-1 text-xs font-medium" style={{ color: "rgba(255,255,255,0.75)" }}>
@@ -208,35 +228,36 @@ function ListingView() {
           <Icon name="chevronRight" size={13} />
           <span>Listings</span>
           <Icon name="chevronRight" size={13} />
-          <span style={{ color: "#fff" }}>{listing.name}</span>
+          <span style={{ color: "#fff" }}>{restaurant?.data?.name}</span>
         </div>
         {/* Hero info */}
         <div className="absolute bottom-0 left-0 right-0 px-5 sm:px-10 pb-7">
           <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full mb-3" style={{ backgroundColor: "var(--primary)", color: "#fff" }}>
-            {listing.category}
+            {restaurant?.data?.main_category}
           </span>
           <h1 className="text-3xl sm:text-5xl font-bold text-white mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>
-            {listing.name}
+            {restaurant?.data?.name}
+            name
           </h1>
           <div className="flex flex-wrap items-center gap-4 text-sm text-white">
             <span className="flex items-center gap-1.5">
-              <Stars rating={listing.rating} size={15} />
-              <span className="font-semibold">{listing.rating}</span>
-              <span style={{ color: "rgba(255,255,255,0.65)" }}>({listing.reviewCount} reviews)</span>
+              <Stars rating={restaurant?.data?.rating || 0} size={15} />
+              <span className="font-semibold">{restaurant?.data?.rating || 0}</span>
+              <span style={{ color: "rgba(255,255,255,0.65)" }}>({restaurant?.data?.reviewCount} reviews)</span>
             </span>
             <span style={{ color: "rgba(255,255,255,0.4)" }}>·</span>
-            <span>{listing.priceRange}</span>
-            <span style={{ color: "rgba(255,255,255,0.4)" }}>·</span>
-            <span className="flex items-center gap-1"><Icon name="mapPin" size={14} />{listing.address.city}, {listing.address.state}</span>
+            <span className="flex items-center gap-1"><Icon name="mapPin" size={14} />{restaurant?.data?.address?.city}, {restaurant?.data?.address?.state}</span>
           </div>
         </div>
         {/* Action buttons */}
         <div className="absolute top-5 right-5 sm:right-10 flex items-center gap-2">
-          {["share", "bookmark"].map((ic) => (
-            <button key={ic} className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: "rgba(255,255,255,0.18)", color: "#fff", backdropFilter: "blur(6px)" }}>
-              <Icon name={ic} size={16} />
-            </button>
-          ))}
+
+          <button onClick={() => {
+            saveListing(_id)
+          }} className="w-9 h-9 rounded-full flex items-center active:scale-110 justify-center" style={{ backgroundColor: "rgba(255,255,255,0.18)", color: "#fff", backdropFilter: "blur(6px)" }}>
+            <Icon name={"bookmark"} size={16} />
+          </button>
+
         </div>
       </div>
 
@@ -262,13 +283,13 @@ function ListingView() {
 
           {/* About */}
           <Section id="about" title="About">
-            <p className="leading-relaxed text-[15px]" style={{ color: "var(--text-muted)" }}>{listing.description}</p>
+            <p className="leading-relaxed text-[15px]" style={{ color: "var(--text-muted)" }}>{restaurant?.data?.description}</p>
           </Section>
 
           {/* Gallery */}
           <Section id="gallery" title="Gallery">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {listing.gallery.map((img, i) => (
+              {restaurantImage?.map((img, i) => (
                 <div key={i} className="gallery-img rounded-xl overflow-hidden cursor-pointer" style={{ aspectRatio: "4/3" }} onClick={() => setLightbox(img)}>
                   <img src={img} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" />
                 </div>
@@ -278,28 +299,19 @@ function ListingView() {
 
           {/* Menu */}
           <Section id="menu" title="Menu">
-            {/* Category tabs */}
-            <div className="flex gap-2 flex-wrap mb-5">
-              {listing.menu.map((cat) => (
-                <button key={cat.category} className="menu-tab px-4 py-1.5 rounded-full text-sm font-semibold border"
-                  style={activeMenu === cat.category
-                    ? { backgroundColor: "var(--primary)", color: "#fff", borderColor: "var(--primary)" }
-                    : { backgroundColor: "transparent", color: "var(--text-muted)", borderColor: "var(--border-default)" }}
-                  onClick={() => setActiveMenu(cat.category)}
-                >
-                  {cat.category}
-                </button>
-              ))}
-            </div>
+
             {/* Items */}
             <div className="flex flex-col gap-3">
-              {listing.menu.find((c) => c.category === activeMenu)?.items.map((item, i) => (
-                <div key={i} className="flex items-start justify-between gap-4 p-4 rounded-xl" style={{ backgroundColor: "var(--bg-page)", border: "1px solid var(--border-default)" }}>
+              {restaurant?.menu?.map((item, i) => (
+                <div key={i} className="flex items-center min-h-35 justify-between gap-4 p-4 rounded-xl" style={{ backgroundColor: "var(--bg-page)", border: "1px solid var(--border-default)" }}>
+                  <div className=" flex flex-col sm:flex-row items-center gap-3">
+                  <img src={item?.image ? item?.image : "/aboutimg1.png"} className="rounded w-35 h-35"/>
                   <div>
-                    <p className="font-semibold text-[15px]" style={{ color: "var(--text-main)" }}>{item.name}</p>
-                    <p className="text-sm mt-0.5" style={{ color: "var(--text-muted)" }}>{item.desc}</p>
+                    <p className="font-semibold text-[15px] " style={{ color: "var(--text-main)" }}>{item.name}</p>
+                    <p className="text-sm mt-0.5 line-clamp-4 w-auto" style={{ color: "var(--text-muted)" }}>{item.description}</p>
+                  <span className="font-bold text-sm shrink-0 mt-0.5" style={{ color: "var(--primary)" }}>${item.price}</span>
                   </div>
-                  <span className="font-bold text-sm shrink-0 mt-0.5" style={{ color: "var(--primary)" }}>{item.price}</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -308,25 +320,25 @@ function ListingView() {
           {/* Facilities */}
           <Section id="facilities" title="Facilities & Features">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {listing.facilities.map((f) => (
-                <div key={f.label} className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: "var(--bg-page)", border: "1px solid var(--border-default)" }}>
+              {restaurant?.data?.features?.map((f, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: "var(--bg-page)", border: "1px solid var(--border-default)" }}>
                   <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: "rgba(37,99,235,0.08)", color: "var(--primary)" }}>
-                    <Icon name={f.icon} size={16} />
+                    <Icon name={"wifi"} size={16} />
                   </span>
-                  <span className="text-sm font-medium" style={{ color: "var(--text-main)" }}>{f.label}</span>
+                  <span className="text-sm font-medium" style={{ color: "var(--text-main)" }}>{f}</span>
                 </div>
               ))}
             </div>
           </Section>
 
           {/* Reviews */}
-          <Section id="reviews" title={`Reviews (${listing.reviewCount})`}>
+          <Section id="reviews" handeReviewModel={() => { setReviewModel(true) }} title={`Reviews (${restaurant?.data?.reviewCount})`} isBtn={true}>
             {/* Summary bar */}
             <div className="flex items-center gap-5 p-5 rounded-xl mb-5" style={{ backgroundColor: "var(--bg-page)", border: "1px solid var(--border-default)" }}>
               <div className="text-center">
-                <p className="text-4xl font-bold" style={{ color: "var(--text-main)", fontFamily: "'Sora', sans-serif" }}>{listing.rating}</p>
-                <Stars rating={listing.rating} size={16} />
-                <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>{listing.reviewCount} reviews</p>
+                <p className="text-4xl font-bold" style={{ color: "var(--text-main)", fontFamily: "'Sora', sans-serif" }}>{restaurant?.data?.rating}</p>
+                <Stars rating={restaurant?.data?.rating} size={16} />
+                <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>{restaurant?.data?.reviewCount} reviews</p>
               </div>
               <div className="flex-1 flex flex-col gap-1.5">
                 {[5, 4, 3, 2, 1].map((n) => (
@@ -342,17 +354,16 @@ function ListingView() {
             </div>
             {/* Review cards */}
             <div className="flex flex-col gap-4">
-              {listing.reviews.map((r, i) => (
+              {restaurant?.reviews?.map((r, i) => (
                 <div key={i} className="p-5 rounded-xl" style={{ border: "1px solid var(--border-default)" }}>
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0" style={{ backgroundColor: "var(--primary)" }}>
                       {r.avatar}
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold text-sm" style={{ color: "var(--text-main)" }}>{r.name}</p>
+                      <p className="font-semibold text-sm" style={{ color: "var(--text-main)" }}>{r.author}</p>
                       <div className="flex items-center gap-2">
                         <Stars rating={r.rating} size={12} />
-                        <span className="text-xs" style={{ color: "var(--text-muted)" }}>{r.date}</span>
                       </div>
                     </div>
                   </div>
@@ -370,7 +381,7 @@ function ListingView() {
           </Section>
 
           {/* Related Listings */}
-          <section id="related">
+          {/* <section id="related">
             <h2 className="text-xl font-bold mb-4" style={{ color: "var(--text-main)", fontFamily: "'Sora', sans-serif" }}>Related Listings</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {listing.related.map((r, i) => (
@@ -389,40 +400,44 @@ function ListingView() {
                 </div>
               ))}
             </div>
-          </section>
+          </section> */}
         </div>
 
         {/* ── Right Sidebar ── */}
         <div className="flex flex-col gap-5">
 
           {/* CTA */}
-          <div className="rounded-2xl p-5" style={{ background: "linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%)" }}>
-            <p className="font-bold text-white text-lg mb-1" style={{ fontFamily: "'Sora', sans-serif" }}>Make a Reservation</p>
-            <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.75)" }}>Book your table in seconds.</p>
-            <button className="w-full py-2.5 rounded-xl text-sm font-bold transition-all duration-150" style={{ backgroundColor: "#fff", color: "var(--primary)" }}>
-              Reserve a Table
-            </button>
-          </div>
+          {restaurant?.data?.contact?.tell && (
+            <div className="rounded-2xl p-5" style={{ background: "linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%)" }}>
+              <p className="font-bold text-white text-lg mb-1" style={{ fontFamily: "'Sora', sans-serif" }}>Make a Reservation</p>
+              <p className="text-sm mb-4" style={{ color: "rgba(255,255,255,0.75)" }}>Book your table in seconds.</p>
+              <Link to={`tel:${restaurant?.data?.contact?.tell}`}>
+                <button className="w-full py-2.5 rounded-xl text-sm font-bold transition-all duration-150" style={{ backgroundColor: "#fff", color: "var(--primary)" }}>
+                  Reserve a Table
+                </button>
+              </Link>
+            </div>
+          )}
 
           {/* Contact */}
           <InfoCard>
             <p className="font-bold text-base mb-4" style={{ color: "var(--text-main)", fontFamily: "'Sora', sans-serif" }} id="contact">Contact</p>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 overflow-hidden">
               {[
-                { icon: "phone", label: "Phone", value: listing.contact.phone, href: `tel:${listing.contact.phone}` },
-                { icon: "whatsapp", label: "WhatsApp", value: listing.contact.whatsapp, href: `https://wa.me/${listing.contact.whatsapp.replace(/\D/g, "")}` },
-                { icon: "email", label: "Email", value: listing.contact.email, href: `mailto:${listing.contact.email}` },
+                { icon: "phone", label: "Phone", value: restaurant?.data?.contact?.phone, href: `tel:${restaurant?.data?.contact?.phone}` },
+                { icon: "whatsapp", label: "WhatsApp", value: restaurant?.data?.contact?.whatsapp, href: `https://wa.me/${restaurant?.data?.contact?.whatsapp?.replace(/\D/g, "")}` },
+                { icon: "email", label: "Email", value: restaurant?.data?.contact?.email, href: `mailto:${restaurant?.data?.contact?.email}` },
               ].map((c) => (
-                <a key={c.label} href={c.href} className="flex items-center gap-3 group" target={c.icon === "whatsapp" ? "_blank" : undefined} rel="noreferrer">
+                <Link key={c.label} to={c.href} className="flex items-center gap-3 group" target={c.icon === "whatsapp" ? "_blank" : undefined} rel="noreferrer">
                   <span className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-150"
                     style={{ backgroundColor: "rgba(37,99,235,0.08)", color: "var(--primary)" }}>
                     <Icon name={c.icon} size={16} />
                   </span>
                   <div>
                     <p className="text-xs" style={{ color: "var(--text-muted)" }}>{c.label}</p>
-                    <p className="text-sm font-medium" style={{ color: "var(--text-main)" }}>{c.value}</p>
+                    <p className="text-sm font-medium " style={{ color: "var(--text-main)" }}>{c.value}</p>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
           </InfoCard>
@@ -435,8 +450,8 @@ function ListingView() {
                 <Icon name="location" size={16} />
               </span>
               <div>
-                <p className="text-sm font-medium" style={{ color: "var(--text-main)" }}>{listing.address.full}</p>
-                <p className="text-sm" style={{ color: "var(--text-muted)" }}>{listing.address.city}, {listing.address.state} {listing.address.zip}</p>
+                <p className="text-sm font-medium " style={{ color: "var(--text-main)" }}>{restaurant?.data?.address?.fullAddress}</p>
+                <p className="text-sm" style={{ color: "var(--text-muted)" }}>{restaurant?.data?.address?.city}, {restaurant?.data?.address?.state} {restaurant?.data?.address?.zip}</p>
               </div>
             </div>
             {/* Google Map embed placeholder */}
@@ -458,20 +473,28 @@ function ListingView() {
           <InfoCard>
             <p className="font-bold text-base mb-4" style={{ color: "var(--text-main)", fontFamily: "'Sora', sans-serif" }} id="hours">Hours of Operation</p>
             <div className="flex flex-col gap-1.5">
-              {listing.hours.map((h) => {
-                const isToday = h.day === today;
+              {Object.keys(workingHours || {}).map((h, idx) => {
+                const isToday = h === today;
                 return (
-                  <div key={h.day} className="flex items-center justify-between px-3 py-2 rounded-lg text-sm"
+                  <div key={idx} className="flex items-center justify-between px-3 py-2 rounded-lg text-sm"
                     style={{ backgroundColor: isToday ? "rgba(37,99,235,0.07)" : "transparent", border: isToday ? "1px solid rgba(37,99,235,0.15)" : "1px solid transparent" }}>
-                    <span className="font-medium" style={{ color: isToday ? "var(--primary)" : "var(--text-main)" }}>{h.day}</span>
-                    <span style={{ color: h.closed ? "var(--error-text)" : isToday ? "var(--primary)" : "var(--text-muted)" }}>
-                      {h.closed ? "Closed" : `${h.open} – ${h.close}`}
+                    <span className="font-medium" style={{ color: isToday ? "var(--primary)" : "var(--text-main)" }}>{h}</span>
+                    <span style={{ color: workingHours[h].closed ? "var(--error-text)" : isToday ? "var(--primary)" : "var(--text-muted)" }}>
+                      {workingHours[h].closed ? "Closed" : `${workingHours[h].open} – ${workingHours[h].close}`}
                     </span>
                   </div>
                 );
               })}
             </div>
           </InfoCard>
+
+          <ReviewModal
+            open={reviewModel}
+            onClose={() => setReviewModel(false)}
+            restaurantId={_id}
+            restaurantName={restaurant?.data?.name}
+            onSuccess={() => setReviewModel(false)}
+          />
         </div>
       </div>
 

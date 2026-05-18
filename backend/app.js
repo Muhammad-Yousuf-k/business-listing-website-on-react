@@ -8,6 +8,8 @@ import cookieParser from "cookie-parser";
 
 import auth_routes from "./src/routes/auth.routes.js";
 import restaurant_routes from "./src/routes/restaurant.routes.js";
+import review_routes from "./src/routes/review.routes.js";
+import menu_routes from "./src/routes/menu.routes.js";
 import csrfProtection from "./src/middlewares/csrf.middleware.js";
 
 import { env } from "./src/config/env.js";
@@ -68,6 +70,8 @@ app.get("/csrf-token", csrfProtection, (req, res) => {
 /* ROUTES */
 app.use("/auth-api", auth_routes);
 app.use("/restaurant-api", restaurant_routes);
+app.use("/review-api", review_routes);
+app.use("/menu-api", menu_routes);
 
 /* ERROR HANDLING */
 app.use(notFound);

@@ -95,9 +95,8 @@ export const SUBSCRIPTION = ["free", "basic", "pro", "premium"];
 export const STATUS = [
   "submit_pending",
   "approved_unpaid",
-  "active_paid",
-  "active_free",
   "rejected",
+  "active_paid",
   "suspended_subscription_end",
   "suspended_violation",
 ];

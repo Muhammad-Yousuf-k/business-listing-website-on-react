@@ -7,19 +7,19 @@ import { Link } from "react-router-dom";
 export default function UserMenu({ img }) {
   const [open, setOpen] = useState(false)
   const { logout, userRole } = useUser();
-  if (!img) {
-    img = "/unknownuser.png"
-  }
+
+
+
 
 
   return (
-    <div className="relative">
+    <div className="relative h-10 w-10 cursor-pointer">
 
       {/* Avatar Button */}
       <img
         onClick={() => setOpen(!open)}
         className={`flex h-10 w-10 items-center justify-center rounded-full`}
-        src={img}
+        src={img == false ? "/unknownuser.png" : img}
       />
       <User size={20} />
 

@@ -1,4 +1,5 @@
 import { RestaurantModel } from "../models/restaurant.model.js";
+import ReviewModel from "../models/review.model.js";
 import { MenuItemsModel } from "../models/menu_item.model.js";
 import slugify from "slugify";
 
@@ -7,11 +8,6 @@ export const createRestaurant = async (req, res, next) => {
     try {
         const payload = req.body;
 
-        console.log('====================================');
-        console.log(payload);
-        console.log('====================================');
-        return
-
         // Owner ID from the authenticated user
         const ownerId = req.user._id;
 
@@ -19,7 +15,7 @@ export const createRestaurant = async (req, res, next) => {
         const slug = slugify(payload.name, { lower: true, strict: true });
 
         // Create a new restaurant entry in the database
-        const restaurant = await Restaurant.create({
+        const restaurant = await RestaurantModel.create({
             ...payload,
             ownerId,
             slug, // Adding the slug generated from the restaurant name
@@ -28,7 +24,6 @@ export const createRestaurant = async (req, res, next) => {
         res.status(201).json({
             success: true,
             message: "Restaurant created successfully",
-            restaurant,
         });
     } catch (error) {
         next(error);
@@ -61,14 +56,20 @@ export const createMenuItems = async (req, res) => {
 
 export const getRestaurants = async (req, res, next) => {
     try {
-        const restaurants = await Restaurant.find()
-            .populate("ownerId", "name email");
+        const restaurants = await RestaurantModel.find({
+            status: { $in: ["active_paid", "active_free"] }
+        })
+            .select("name main_category address.city reviewCount rating images priorityScore")
+            .sort({ priorityScore: -1 })
+            .limit(8)
+            .lean();
 
-        res.status(200).json({
+        res.json({
             success: true,
             count: restaurants.length,
-            restaurants,
+            restaurants
         });
+
     } catch (error) {
         next(error);
     }
@@ -76,8 +77,24 @@ export const getRestaurants = async (req, res, next) => {
 
 export const getRestaurantById = async (req, res, next) => {
     try {
-        const restaurant = await Restaurant.findById(req.params.id)
-            .populate("ownerId", "name email");
+        const restaurantId = req.params._id;
+
+        const [restaurant, reviews, menuItems] = await Promise.all([
+            RestaurantModel.findById(restaurantId)
+                .select("name rating reviewCount main_category address description images features contact workingHours")
+                .lean(),
+
+            ReviewModel.find({ restaurantId })
+                .select("author restaurantName rating text avatar")
+                .sort({ createdAt: -1 }) // better UX than rating sort
+                .limit(3)
+                .lean(),
+
+            MenuItemsModel.find({ restaurantId })
+                .select("name description price image foodCategory tags")
+                .limit(5)
+                .lean()
+        ]);
 
         if (!restaurant) {
             return res.status(404).json({
@@ -89,7 +106,10 @@ export const getRestaurantById = async (req, res, next) => {
         res.status(200).json({
             success: true,
             restaurant,
+            reviews,
+            menuItems
         });
+
     } catch (error) {
         next(error);
     }
@@ -145,25 +165,27 @@ export const deleteRestaurant = async (req, res, next) => {
         next(error);
     }
 };
+
 export const search = async (req, res, next) => {
     try {
-        const { q, state, save_listing, city, dish } = req.query;
+        const { q, q1 } = req.query;
 
-        if (!q && !state && !save_listing && !city && !dish) {
+        if (!q && !q1) {
             return res.status(400).json({
                 success: false,
                 message: "All search parameters are required",
             });
         }
 
-        console.log("search");
-        
+        console.log("search", q, q1);
+
 
 
 
         res.status(200).json({
             success: true,
-            message: "Restaurant deleted successfully",
+            message: "search successfully",
+            result: null,
         });
     } catch (error) {
         next(error);

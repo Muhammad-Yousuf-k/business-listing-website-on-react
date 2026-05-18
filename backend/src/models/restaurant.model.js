@@ -104,7 +104,6 @@ const restaurantSchema = new mongoose.Schema(
         subscriptionId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Subscription",
-            required: true,
         },
 
         features: {
@@ -117,22 +116,14 @@ const restaurantSchema = new mongoose.Schema(
             default: [],
         },
 
-        boostScore: {
+        priorityScore: {
             type: Number,
             default: 0,
+            min: 0
         },
 
-        menuItemsId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "MenuItems",
-            required: true,
-        },
-
-        reviewsId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Reviews",
-            required: true,
-        },
+        rating: { type: Number, default: 0 },
+        reviewCount: { type: Number, default: 0 },
 
         images: {
             type: [String],
@@ -151,13 +142,13 @@ const restaurantSchema = new mongoose.Schema(
 );
 
 // Indexes
-restaurantSchema.index({ name: 1 }); // Index on name for faster lookup
-restaurantSchema.index({ main_category: 1 }); // Index on main_category for faster lookup
-restaurantSchema.index({ status: 1 }); // Index on status for faster lookup
-restaurantSchema.index({ subscriptionId: 1 }); // Index on subscriptionId for faster lookup
-restaurantSchema.index({ boostScore: 1 }); // Index on boostScore for faster lookup
-restaurantSchema.index({ menuItemsId: 1 }); // Index on menuItemsId for faster lookup
-restaurantSchema.index({ reviewsId: 1 }); // Index on reviewsId for faster lookup
+restaurantSchema.index({ status: 1, priorityScore: -1 });
+restaurantSchema.index({ main_category: 1, status: 1, priorityScore: -1 });
+restaurantSchema.index({ "address.city": 1, status: 1, priorityScore: -1 });
+
+restaurantSchema.index({ subscriptionId: 1 });
+restaurantSchema.index({ ownerId: 1 });
+restaurantSchema.index({ name: "text" });
 
 // You can also add a compound index if you frequently query by both `main_category` and `status` 
 // restaurantSchema.index({ main_category: 1, status: 1 });

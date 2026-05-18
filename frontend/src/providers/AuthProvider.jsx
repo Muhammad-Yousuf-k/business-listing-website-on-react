@@ -14,6 +14,7 @@ const AuthProvider = ({ children }) => {
   const [userAvatar, setUserAvatar] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   const isLoggedIn = !!user;
 
@@ -69,6 +70,7 @@ const AuthProvider = ({ children }) => {
       setUserRole(res.data.user?.role || null);
       setUserAvatar(res.data.user?.avatar || "/unknownuser.png");
       setError(null);
+      setSuccess(res || "Login Sucessfully");
       return true;
 
     } catch (err) {
@@ -96,6 +98,8 @@ const AuthProvider = ({ children }) => {
       const res = await api.post("/auth-api/register", form);
 
       setError(null);
+      setSuccess(res || "register Sucessfully");
+
       return true;
     } catch (err) {
       setError(err || "Registration failed");
@@ -110,12 +114,13 @@ const AuthProvider = ({ children }) => {
     setLoading(true);
 
     try {
-      await api.post("/auth-api/logout");
+      const res = await api.post("/auth-api/logout");
 
       setUser(null);
       setUserRole(null);
       setUserAvatar(null);
       setError(null);
+      setSuccess(res || "Logout Sucessfully");
     } catch (err) {
       setError(err || "Logout failed");
     } finally {
@@ -133,8 +138,10 @@ const AuthProvider = ({ children }) => {
         otp,
         purpose,
       });
+      setSuccess(res || "OTP Verifyed");
 
       setError(null);
+
       return true;
     } catch (err) {
       setError(err || "OTP verification failed");
@@ -154,6 +161,7 @@ const AuthProvider = ({ children }) => {
       });
 
       setError(null);
+      setSuccess(res || "OTP Resend");
       return true;
     } catch (err) {
       setError(err || "OTP resend failed");
@@ -169,10 +177,22 @@ const AuthProvider = ({ children }) => {
 
     if (error === null) { return }
     toast.error(err?.response?.data?.message || "something went wrong");
+    setError(null)
 
-  };
+  }
 
-  useEffect(() => { errorHandler(error) }, [error])
+  const successHandler = (success) => {
+
+    if (success === null) { return }
+    toast.success(success?.data?.message || "work done");
+    setSuccess(null)
+
+  }
+
+  useEffect(() => {
+    errorHandler(error)
+    successHandler(success)
+  }, [error, success])
 
 
   return (

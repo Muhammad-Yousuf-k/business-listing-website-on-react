@@ -3,7 +3,7 @@ import { RestaurantModel } from "../models/restaurant.model.js";
 const isRestaurantOwner = async (req, res, next) => {
     try {
         const userId = req.user?._id;
-        const restaurantId = req.params.id;
+        const restaurantId = req.params?._id;
 
         if (!userId) {
             return res.status(401).json({
@@ -30,17 +30,14 @@ const isRestaurantOwner = async (req, res, next) => {
         if (!isOwner && !isAdmin) {
             return res.status(403).json({
                 success: false,
-                message: "You are not allowed to modify this restaurant",
+                message: "You are not allowed",
             });
         }
 
         req.restaurant = restaurant;
         next();
     } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: "Server error while checking ownership",
-        });
+        next(error)
     }
 };
 

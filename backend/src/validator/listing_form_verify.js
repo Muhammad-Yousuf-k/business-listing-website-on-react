@@ -1,55 +1,173 @@
 import { body } from "express-validator";
-import { ROLE } from "../constant/AUTH_CONSTANT.js";  // Corrected import with .js extension
-import { userModel } from "../models/user.model.js";  // Corrected import with .js extension
+import {
+    RESTAURANT_CATEGORIES,
+    FOOD_CATEGORIES,
+} from "../constant/RESTAURANT_CONSTANT.js";
 
-// Auth validator (example for login/register)
-export const authValidator = {
+export const listingValidator = {
 
     listing: [
-        body("email")
-            .trim()
-            .notEmpty()
-            .withMessage("Email is required")
-            .isEmail()
-            .withMessage("Invalid email"),
-
-
-        body("password")
-            .notEmpty()
-            .withMessage("Password is required"),
-    ],
-
-    menuItems: [
+        // Name
         body("name")
             .trim()
             .notEmpty()
-            .withMessage("Name is required"),
+            .withMessage("Name is required")
+            .isLength({ min: 2, max: 120 })
+            .withMessage("Name must be between 2 and 120 characters"),
 
-
-        body("email")
+        // Description
+        body("description")
             .trim()
             .notEmpty()
-            .withMessage("Email is required")
-            .isEmail()
-            .withMessage("Invalid email")
-            .custom(async (value) => {
-                const existingEmail = await userModel.findOne({ email: value });
-                if (existingEmail) {
-                    throw new Error("User exist already")
-                }
-            }),
+            .withMessage("Description is required")
+            .isLength({ min: 10, max: 2000 })
+            .withMessage("Description must be between 10 and 2000 characters"),
 
-        body("password")
+        // Main Category
+        body("main_category")
             .notEmpty()
-            .withMessage("Password is required"),
+            .withMessage("Main category is required")
+            .isIn(RESTAURANT_CATEGORIES)
+            .withMessage("Invalid main category"),
 
-        body("role")
-            .notEmpty()
-            .withMessage("role is required")
-            .isIn(["viewer", "owner"]),
-
-        body("phone_number")
+        // Sub Categories
+        body("sub_category")
             .optional()
+            .isArray()
+            .withMessage("Sub category must be an array"),
 
-    ]
+        body("sub_category.*")
+            .optional()
+            .isIn(FOOD_CATEGORIES)
+            .withMessage("Invalid sub category"),
+
+        // Contact
+        body("contact")
+            .optional()
+            .isObject()
+            .withMessage("Contact must be an object"),
+
+        body("contact.phone")
+            .optional()
+            .trim()
+            .isLength({ min: 6, max: 20 })
+            .withMessage("Phone number is invalid"),
+
+        body("contact.tell")
+            .optional()
+            .trim()
+            .isLength({ min: 6, max: 20 })
+            .withMessage("Tell number is invalid"),
+
+        body("contact.whatsapp")
+            .optional()
+            .trim()
+            .isLength({ min: 6, max: 20 })
+            .withMessage("Whatsapp number is invalid"),
+
+        body("contact.email")
+            .optional()
+            .trim()
+            .isEmail()
+            .withMessage("Invalid email address"),
+
+        // Address
+        body("address")
+            .optional()
+            .isObject()
+            .withMessage("Address must be an object"),
+
+        body("address.country")
+            .trim()
+            .notEmpty()
+            .withMessage("country is required")
+            .isLength({ min: 2, max: 100 })
+            .withMessage("Invalid country"),
+
+        body("address.city")
+            .trim()
+            .notEmpty()
+            .withMessage("city is required")
+            .isLength({ min: 2, max: 100 })
+            .withMessage("Invalid city"),
+
+        body("address.street")
+            .trim()
+            .notEmpty()
+            .withMessage("Street is required")
+            .isLength({ min: 2, max: 200 })
+            .withMessage("Invalid street"),
+
+        body("address.area")
+            .trim()
+            .notEmpty()
+            .withMessage("area is required")
+            .isLength({ min: 2, max: 100 })
+            .withMessage("Invalid area"),
+
+        body("address.state")
+            .trim()
+            .notEmpty()
+            .withMessage("state is required")
+            .isLength({ min: 2, max: 100 })
+            .withMessage("Invalid state"),
+
+        body("address.fullAddress")
+            .optional()
+            .trim()
+            .isLength({ min: 5, max: 500 })
+            .withMessage("Invalid full address"),
+
+        // Location
+        body("address.location")
+            .optional()
+            .isObject()
+            .withMessage("Location must be an object"),
+
+        body("address.location.lat")
+            .optional()
+            .isFloat({ min: -90, max: 90 })
+            .withMessage("Invalid latitude"),
+
+        body("address.location.lng")
+            .optional()
+            .isFloat({ min: -180, max: 180 })
+            .withMessage("Invalid longitude"),
+
+        // Working Hours
+        body("workingHours")
+            .optional()
+            .isObject()
+            .withMessage("Working hours must be an object"),
+
+        // Features
+        body("features")
+            .optional()
+            .isArray()
+            .withMessage("Features must be an array"),
+
+        body("features.*")
+            .optional()
+            .trim()
+            .isString()
+            .withMessage("Feature must be a string"),
+
+        // Tags
+        body("tags")
+            .optional()
+            .isArray()
+            .withMessage("Tags must be an array"),
+
+        body("tags.*")
+            .optional()
+            .trim()
+            .isString()
+            .withMessage("Tag must be a string"),
+
+        // Images
+        body("images")
+            .optional()
+            .isArray()
+            .withMessage("Images must be an array"),
+    ],
 };

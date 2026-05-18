@@ -1,0 +1,9 @@
+{
+  "restaurantId": "6a0a6d17f1e8d2ac240aa89f",
+  "name": "red eats",
+  "description": "Premium BBQ and steak restaurant",
+  "price": 499,
+  "image": "",
+  "foodCategory": "Fried Chicken",
+  "tags": ["aaa", "bbb"]
+}

@@ -105,7 +105,7 @@ const SaveBtn = ({ loading, label = "Save Changes", onClick }) => (
 )
 
 /* ─── Main Account Page ──────────────────────────────────────── */
-export default function AccountPage() {
+export default function Account() {
   const { user, userAvatar } = useContext(AuthContext)
 
   /* Avatar */
