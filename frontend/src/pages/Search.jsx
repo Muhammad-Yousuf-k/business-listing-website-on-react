@@ -3,7 +3,9 @@ import CommonHeroSec from "../components/CommonHeroSec"
 import { useLocation } from "react-router-dom"
 import { useRestaurant } from "../hooks/useRestaurant"
 import RestaurantCard from '../components/RestaurantCard'
+import ButtonOne from '../components/ButtonOne'
 import Icon from "../components/Icon"
+import { toast } from 'react-toastify'
 
 /* ─── Stars ──────────────────────────────────────────────────── */
 const Stars = ({ rating, size = 12 }) => (
@@ -238,14 +240,18 @@ const Search = () => {
   const location = useLocation()
   const { search_restaurants, searchResult } = useRestaurant()
   const queryParams = new URLSearchParams(location.search)
-
+  const [page, setPage] = useState(1)
   const q = queryParams.get('q')
   const q1 = queryParams.get('q1')
   const source = queryParams.get('source')
 
   const queryString = (() => {
     switch (source) {
-      case 'single': return `q=${encodeURIComponent(q || 'none')}`
+      case 'state': return `state/?q=${encodeURIComponent(q || 'none')}&page=${page}&limit=12`
+      case 'all-restaurants': return `all-restaurants/?q=${encodeURIComponent(q || 'none')}&page=${page}&limit=12`
+      case 'eat': return `eat/?q=${encodeURIComponent(q || 'none')}&q1=${encodeURIComponent(q1 || 'none')}&page=${page}&limit=12`
+      case 'top-eats': return `top-eats/?q=${encodeURIComponent(q || 'none')}&page=${page}&limit=12`
+      case 'all-reviews': return `all-reviews/?q=${encodeURIComponent(q || 'none')}&page=${page}&limit=12`
       case 'double': return `q=${encodeURIComponent(q || "none")}&q1=${encodeURIComponent(q1 || "none")}`
     }
   })()
@@ -254,7 +260,19 @@ const Search = () => {
   const [view, setView] = useState('grid')   // 'grid' | 'list'
   const [sort, setSort] = useState('rating')
 
+  function pageNext() {
+    if (!searchResult?.pagination?.hasNextPage) {
+      return toast.info("There is no next page");
+    }
+    setPage((prev) => prev + 1);
+  }
 
+  function pagePrev() {
+    if (!searchResult?.pagination?.hasPrevPage) {
+      return toast.info("There is no previous page");
+    }
+    setPage((prev) => prev - 1);
+  }
 
 
   useEffect(() => {
@@ -264,16 +282,15 @@ const Search = () => {
       setLoading(false)
     }
     handleSearch()
-  }, [queryString])
+  }, [queryString, page])
 
 
 
-  const sorted = [searchResult].sort((a, b) => {
-    if (sort === 'rating') return b.rating - a.rating
-    if (sort === 'name') return a.name.localeCompare(b.name)
-    if (sort === 'newest') return b.id - a.id
-    return 0
-  })
+  const sorted = [...(searchResult?.result || [])].sort((a, b) => {
+    if (sort === "rating") return (b.rating || 0) - (a.rating || 0);
+    if (sort === "name") return (a.name || "").localeCompare(b.name || "");
+    return 0;
+  });
 
 
   const handleSuggest = (term) => {
@@ -306,7 +323,7 @@ const Search = () => {
           <p className="text-sm font-semibold" style={{ color: 'var(--gray-color)' }}>
             {loading
               ? 'Searching...'
-              : <><span style={{ color: 'var(--gray-color)', fontWeight: 700 }}>{searchResult?.length}</span> restaurants found</>
+              : <><span style={{ color: 'var(--gray-color)', fontWeight: 700 }}>{searchResult?.pagination?.totalRestaurants || 0}</span> restaurants found</>
             }
           </p>
 
@@ -348,8 +365,10 @@ const Search = () => {
             )
         )}
 
+
+
         {/* ── Results ───────────────────────────────────────── */}
-        {!loading && sorted.length > 1 && (
+        {!loading && sorted.length > 0 && (
           view === 'grid'
             ? (
               <div className="flex flex-wrap gap-5 justify-center">
@@ -361,6 +380,24 @@ const Search = () => {
               </div>
             )
         )}
+
+        {!loading && sorted.length > 0 && (
+          <div
+            className="flex items-center justify-center flex-col gap-2 flex-wrap mt-8 px-5 py-4 rounded-2xl"
+            style={{ backgroundColor: 'var(--white-color)', border: '1px solid var(--border-default)' }}
+          >
+
+            <span>Pages  {searchResult?.pagination?.currentPage || 0}:{searchResult?.pagination?.totalPages || 1}</span>
+            <div className="flex items-center justify-center gap-3">
+              {/* Sort */}
+              <ButtonOne onClick={pagePrev} title={"Prev"} />
+              <ButtonOne onClick={pageNext} title={"Next"} />
+            </div>
+          </div>
+
+        )}
+
+
 
         {/* ── Empty state ────────────────────────────────────── */}
         {!loading && sorted.length === 0 && (

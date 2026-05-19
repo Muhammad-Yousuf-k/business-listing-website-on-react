@@ -7,18 +7,24 @@ const ContentProvider = ({ children }) => {
   const contactInfo = {
     email: "rankeats@gmail.com",
     tel: "+1 (111) 111-1111",
+    telLink: "+11111111111",
     address: "San Francisco, CA 94102",
+    googleMap: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.019565!2d-122.4194!3d37.7749!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDQ2JzI5LjYiTiAxMjLCsDI1JzA5LjgiVw!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus",
   }
   // social Link
   const socialLink = [
-    { name: "facebook", href: "#", label: "Facebook" },
-    { name: "instagram", href: "#", label: "Instagram" },
-    { name: "twitter", href: "#", label: "Twitter / X" },
-    { name: "youtube", href: "#", label: "YouTube" },
+    { name: "facebook", to: "#", label: "Facebook" },
+    { name: "instagram", to: "#", label: "Instagram" },
+    { name: "twitter", to: "#", label: "Twitter / X" },
+    { name: "youtube", to: "#", label: "YouTube" },
   ]
   // Form Emails
   const formEmails = {
     newsletter: {
+      to: "rankeats@gmail.com",
+      from: "rankeats@gmail.com"
+    },
+    contactForm: {
       to: "rankeats@gmail.com",
       from: "rankeats@gmail.com"
     },
@@ -70,13 +76,18 @@ const ContentProvider = ({ children }) => {
     TopStates: TopStates,
 
   }
+  const ContactPagePackage = {
+    contactInfo: contactInfo,
+    socialLink: socialLink,
+    formEmails: formEmails,
+
+  }
 
   return (
     <ContentContext.Provider
       value={{
-        // footer Content
         footerPackage,
-        // footer Content
+        ContactPagePackage,
 
       }}
     >

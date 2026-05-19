@@ -10,6 +10,7 @@ import auth_routes from "./src/routes/auth.routes.js";
 import restaurant_routes from "./src/routes/restaurant.routes.js";
 import review_routes from "./src/routes/review.routes.js";
 import menu_routes from "./src/routes/menu.routes.js";
+import search_routes from "./src/routes/search_routes.js";
 import csrfProtection from "./src/middlewares/csrf.middleware.js";
 
 import { env } from "./src/config/env.js";
@@ -44,14 +45,17 @@ if (env.nodeEnv === "development") {
     app.use(morgan("dev"));
 }
 
-// /* RATE LIMIT */
-// app.use(
-//     rateLimit({
-//         windowMs: 15 * 60 * 1000,
-//         max: 100,
-//         message: "Too many requests, please try again later.",
-//     })
-// );
+if (env.nodeEnv !== "development") {
+    // /* RATE LIMIT */
+    app.use(
+        rateLimit({
+            windowMs: 15 * 60 * 1000,
+            max: 100,
+            message: "Too many requests, please try again later.",
+        })
+    );
+
+}
 
 /* HEALTH CHECK */
 app.get("/", (req, res) => {
@@ -72,6 +76,7 @@ app.use("/auth-api", auth_routes);
 app.use("/restaurant-api", restaurant_routes);
 app.use("/review-api", review_routes);
 app.use("/menu-api", menu_routes);
+app.use("/search-api", search_routes);
 
 /* ERROR HANDLING */
 app.use(notFound);

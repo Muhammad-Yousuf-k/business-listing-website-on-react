@@ -77,7 +77,7 @@ function StatesDropdown({ mobile = false }) {
                 ? filtered.map(state => (
                   <Link
                     key={state}
-                    to={`/search/?q=${encodeURIComponent(state)}&source=single`}
+                    to={`/search/?q=${encodeURIComponent(state)}&source=state`}
                     className="block py-1.5 text-sm"
                     style={{ color: '#d1d5db' }}
                     onClick={() => { setOpen(false); setQuery('') }}
@@ -143,7 +143,7 @@ function StatesDropdown({ mobile = false }) {
               ? filtered.map(state => (
                 <Link
                   key={state}
-                  to={`/search/?q=${encodeURIComponent(state)}&source=single`}
+                  to={`/search/?q=${encodeURIComponent(state)}&source=state`}
                   className="flex items-center px-4 py-2.5 text-sm state-option"
                   style={{ color: '#374151', textDecoration: 'none' }}
                   onClick={() => { setOpen(false); setQuery('') }}

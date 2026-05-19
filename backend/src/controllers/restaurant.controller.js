@@ -1,5 +1,5 @@
 import { RestaurantModel } from "../models/restaurant.model.js";
-import ReviewModel from "../models/review.model.js";
+import {ReviewModel} from "../models/review.model.js";
 import { MenuItemsModel } from "../models/menu_item.model.js";
 import slugify from "slugify";
 

@@ -1,5 +1,5 @@
 import { RestaurantModel } from "../models/restaurant.model.js";
-import ReviewModel from "../models/review.model.js";
+import {ReviewModel} from "../models/review.model.js";
 
 //    CREATE REVIEW
 export const createReview = async (req, res, next) => {

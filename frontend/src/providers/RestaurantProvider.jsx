@@ -12,7 +12,10 @@ const RestaurantProvider = ({ children }) => {
     restaurant: {},
   });
 
-  const [searchResult, setSearchResult] = useState([]);
+  const [searchResult, setSearchResult] = useState({
+    result: [],
+    pagination: {}
+  });
 
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -123,14 +126,22 @@ const RestaurantProvider = ({ children }) => {
   }
 
   /* Create Restaurant Listing */
-  const search_restaurants = async (queryString) => {
+  const search_restaurants = async (searchString) => {
     setLoading(true);
-    if (queryString === lastQuery.current) return;
+    if (searchString === lastQuery.current) {
+      setLoading(false);
+      return;
+    }
 
     try {
-      const res = await api.get(`/restaurant-api/search/?${queryString}`);
-      setSearchResult(res?.data?.result)
-      lastQuery.current = queryString;
+      const res = await api.get(`/search-api/${searchString}`);
+      setSearchResult((prev) => ({
+        ...prev,
+        result: res?.data?.result || [],
+        pagination: res?.data?.pagination || {},
+      }));
+      console.log(res?.data);
+      lastQuery.current = searchString;
       setError(null);
       return true;
     } catch (err) {

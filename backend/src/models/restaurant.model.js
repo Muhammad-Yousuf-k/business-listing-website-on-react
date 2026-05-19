@@ -4,6 +4,7 @@ import {
     FOOD_CATEGORIES,
     SUBSCRIPTION,
     STATUS,
+    STATE,
 } from "../constant/RESTAURANT_CONSTANT.js";
 
 const restaurantSchema = new mongoose.Schema(
@@ -55,7 +56,7 @@ const restaurantSchema = new mongoose.Schema(
             city: { type: String, default: "" },
             street: { type: String, default: "" },
             area: { type: String, default: "" },
-            state: { type: String, default: "" },
+            state: { type: String, enum: STATE, default: "" },
             fullAddress: { type: String, default: "" },
             location: {
                 lat: Number,

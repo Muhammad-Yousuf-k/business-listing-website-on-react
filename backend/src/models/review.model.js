@@ -75,6 +75,4 @@ reviewSchema.pre("save", function () {
     }
 });
 
-const ReviewModel = mongoose.model("Review", reviewSchema);
-
-export default ReviewModel;
+export const ReviewModel = mongoose.model("Review", reviewSchema);

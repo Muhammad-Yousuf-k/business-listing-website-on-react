@@ -15,7 +15,7 @@ const CommonCta = ({ title = "Own a Restaurant?", para = "Get your restaurant li
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
                 <ButtonTwo path="/owner/listing/create" title={"Add Your Restaurant"} icon={"left"} iconName={"users"} iconSize={15} />
-                <ButtonOne path="/for-business" title={"Learn More"} isInverted={true} />
+                <ButtonOne path="/for-business/#hero" title={"Learn More"} isInverted={true} />
             </div>
         </section>
     )

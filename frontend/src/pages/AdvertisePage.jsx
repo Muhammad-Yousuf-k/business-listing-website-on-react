@@ -101,6 +101,7 @@ export default function AdvertisePage() {
 
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section
+        id="hero"
         className="relative overflow-hidden px-4 pt-24 pb-20 flex flex-col items-center text-center gap-8"
         style={{ background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(241,89,42,0.25) 0%, transparent 65%), #0d0d0d" }}
       >
@@ -138,8 +139,8 @@ export default function AdvertisePage() {
           </div>
 
           <div className="flex flex-wrap gap-3 justify-center fade-up fade-up-4">
-            <ButtonTwo title="Start Advertising" icon="right" iconName="arrowRight" />
-            <ButtonOne title="See How It Works" icon="playCircle" isInverted={true} />
+            <ButtonTwo title="Start Advertising" path="/for-business/#pricing" icon="right" iconName="arrowRight" />
+            <ButtonOne title="See How It Works" icon="playCircle" path="/for-business/#howItWork" isInverted={true} />
           </div>
         </div>
 
@@ -210,7 +211,7 @@ export default function AdvertisePage() {
       </section>
 
       {/* ── ACHIEVE YOUR GOALS ───────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 py-20 flex flex-col gap-12">
+      <section id="howItWork" className="max-w-6xl mx-auto px-4 py-20 flex flex-col gap-12">
         <div className="flex flex-col items-center gap-3 text-center">
           <Pill>Why Advertise</Pill>
           <h2 className="exo-2 font-bold text-3xl sm:text-5xl" style={{ color: "#1a1a1a" }}>Achieve Your Business Goals</h2>
@@ -284,7 +285,7 @@ export default function AdvertisePage() {
               </p>
             </div>
 
-            <ButtonTwo title="Start Advertising" icon="right" iconName="arrowRight" isInverted={true} />
+            <ButtonTwo title="Start Advertising" path="/for-business/#pricing" icon="right" iconName="arrowRight" isInverted={true} />
           </div>
 
           {/* Visual */}

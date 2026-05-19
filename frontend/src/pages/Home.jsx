@@ -33,7 +33,7 @@ const HomePage = () => {
 
   const handleSearch = async () => {
     setIsSubmitted(true)
-    const queryString = `q=${encodeURIComponent(searchEat)}&q1=${encodeURIComponent(searchState)}&source=double`;
+    const queryString = `eat/q=${encodeURIComponent(searchEat)}&q1=${encodeURIComponent(searchState)}&source=eat`;
     navigate(`/search/?${queryString}`)
     setIsSubmitted(false)
 
@@ -114,8 +114,8 @@ const HomePage = () => {
           </div>
 
           <div className="flex flex-wrap justify-center gap-3">
-            <ButtonOne path="/search/?q=all-restaurants&source=single" title={"Browse Restaurants"} isInverted={true} />
-            <ButtonTwo path="/search/?q=top-eats&source=single" title={"Top Ranked Eats"} icon={"left"} iconName={"trophy"} iconSize={15} />
+            <ButtonOne path="/search/?q=all-restaurants&source=all-restaurants" title={"Browse Restaurants"} isInverted={true} />
+            <ButtonTwo path="/search/?q=top-eats&source=top-eats" title={"Top Ranked Eats"} icon={"left"} iconName={"trophy"} iconSize={15} />
           </div>
         </div>
 
@@ -195,7 +195,7 @@ const HomePage = () => {
         <div className="max-w-6xl mx-auto flex flex-col gap-12">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <SectionHeading label="Community Favorites" title="Best Restaurants" />
-            <ButtonOne path="/search/?q=all-restaurants&source=single" title={"View All"} icon={true} />
+            <ButtonOne path="/search/?q=all-restaurants&source=all-restaurants" title={"View All"} icon={true} />
           </div>
           <div className="flex flex-wrap gap-5 justify-center">
             {restaurants?.map((e, idx) => (
@@ -211,7 +211,7 @@ const HomePage = () => {
         <div className="max-w-6xl mx-auto flex flex-col gap-12">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <SectionHeading label="What People Are Saying" title="Latest Reviews" />
-            <ButtonOne path="/search/?q=all-reviews&source=single" title={"All Reviews"} icon={true} />
+            <ButtonOne path="/search/?q=all-reviews&source=all-reviews" title={"All Reviews"} icon={true} />
 
           </div>
           <div className="flex flex-wrap gap-5 justify-center">
