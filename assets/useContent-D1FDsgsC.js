@@ -1,0 +1,1 @@
+import{f as e,h as t}from"./jsx-runtime-Bcc1dQIj.js";import{t as n}from"./index-DGZzsBiK.js";var r=t(e(),1),i=()=>{let e=(0,r.useContext)(n);if(!e)throw Error(`useContent must be used inside ContentProvider`);return e};export{i as t};
