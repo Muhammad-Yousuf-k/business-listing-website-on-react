@@ -1,4 +1,4 @@
-import { useEffect, useState, cache } from "react";
+import { useEffect, useState } from "react";
 import api from "../api/interceptors";
 import { setCsrfToken } from "../api/csrf";
 import { AuthContext } from "../context/AuthContext";
@@ -35,8 +35,6 @@ const AuthProvider = ({ children }) => {
         // Ensure the user object exists in the response
         if (res.data && res.data.user) {
           setUser(res.data.user);
-          setUserRole(res.data.user?.role || null);
-          setUserAvatar(res.data.user?.avatar || "/unknownuser.png");
         } else {
           throw new Error("User data not found in response");
         }
@@ -44,8 +42,6 @@ const AuthProvider = ({ children }) => {
         setError(null);
       } catch (err) {
         setUser(null);
-        setUserRole(null);
-        setUserAvatar(null);
         // setError(err);
       } finally {
         setLoading(false);
@@ -66,20 +62,19 @@ const AuthProvider = ({ children }) => {
         password,
       });
 
-      setUser(res.data.user);
-      setUserRole(res.data.user?.role || null);
-      setUserAvatar(res.data.user?.avatar || "/unknownuser.png");
+      setUser(res?.data?.user);
       setError(null);
       setSuccess(res || "Login Sucessfully");
       return true;
 
     } catch (err) {
-      setError(err || "Login failed");
+      setError(err || "Login failed. Check your credentials and try again.");
 
       if (err.response?.data?.errorCode === "435345") {
         navigate("/verify-otp", {
           state: {
             email: email,
+            purpose: "verify_email",
           },
         });
       }
@@ -98,11 +93,11 @@ const AuthProvider = ({ children }) => {
       const res = await api.post("/auth-api/register", form);
 
       setError(null);
-      setSuccess(res || "register Sucessfully");
+      setSuccess(res || "register Successfully");
 
       return true;
     } catch (err) {
-      setError(err || "Registration failed");
+      setError(err);
       return false;
     } finally {
       setLoading(false);
@@ -120,42 +115,60 @@ const AuthProvider = ({ children }) => {
       setUserRole(null);
       setUserAvatar(null);
       setError(null);
-      setSuccess(res || "Logout Sucessfully");
+      setSuccess(res);
     } catch (err) {
-      setError(err || "Logout failed");
+      setError(err);
     } finally {
       setLoading(false);
     }
   };
 
   /* verify OTP */
-  const verifyOTP = async (email, otp, purpose) => {
+  const verifyOtp = async (email, otp, purpose, newPassword = "") => {
     setLoading(true);
 
     try {
-      const res = await api.post("/auth-api/verify-otp", {
+      const res = await api.post("/auth-api/otp-verify", {
         email,
         otp,
         purpose,
+        newPassword,
       });
-      setSuccess(res || "OTP Verifyed");
+      setSuccess(res);
 
       setError(null);
 
       return true;
     } catch (err) {
-      setError(err || "OTP verification failed");
+      setError(err);
       return false;
     } finally {
       setLoading(false);
     }
   };
 
+  const resetPassword = async (email) => {
+    try {
+
+      const res = await api.post("/auth-api/reset-password", {
+        email
+      });
+
+
+      setSuccess(res);
+      return true
+    } catch (error) {
+      setError(error || "Role updated failed");
+      return false
+    }
+  };
+
+
   const resendOTP = async (email, purpose) => {
     setLoading(true);
 
     try {
-      const res = await api.post("/auth-api/resend-otp", {
+      const res = await api.post("/auth-api/send-otp", {
         email,
         purpose,
       });
@@ -173,6 +186,82 @@ const AuthProvider = ({ children }) => {
 
 
 
+
+  /* verify OTP */
+  const verifyEmailOTPForPassword = async (email, otp, purpose, NewPassword) => {
+    setLoading(true);
+
+    try {
+      const res = await api.post("/auth-api/reset-password-verify", {
+        email,
+        otp,
+        purpose,
+        NewPassword,
+      });
+      setSuccess(res);
+
+      setError(null);
+
+      return true;
+    } catch (err) {
+      setError(err);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
+
+
+
+
+  const handleUpdateRole = async (role) => {
+    try {
+      if (user?.role === role) {
+        toast.info(`You are already ${role}`);
+        return;
+      }
+
+      const res = await api.post("/auth-api/update-role", {
+        role,
+      });
+
+      setUser((prev) => ({
+        ...prev,
+        role: res?.data?.role || role,
+      }));
+
+      setSuccess(res);
+    } catch (error) {
+      setError(error || "Role updated failed");
+    }
+  };
+
+  const handleUpdateAvatar = async (form) => {
+    try {
+      if (!form) {
+        toast.error("image not found");
+        return;
+      }
+
+      const res = await api.post("/auth-api/update-avatar", form);
+
+      setUser((prev) => ({
+        ...prev,
+        avatar: res?.data?.avatar || "",
+      }));
+
+      setSuccess(res);
+    } catch (error) {
+      setError(error || "Role updated failed");
+    }
+  };
+
+
+
+
   const errorHandler = (err) => {
 
     if (error === null) { return }
@@ -184,10 +273,11 @@ const AuthProvider = ({ children }) => {
   const successHandler = (success) => {
 
     if (success === null) { return }
-    toast.success(success?.data?.message || "work done");
+    toast.success(success?.data?.message || success);
     setSuccess(null)
 
   }
+
 
   useEffect(() => {
     errorHandler(error)
@@ -201,13 +291,17 @@ const AuthProvider = ({ children }) => {
         user,
         userRole,
         userAvatar,
+        handleUpdateRole,
+        handleUpdateAvatar,
         isLoggedIn,
         loading,
         error,
         login,
         register,
         logout,
-        verifyOTP,
+        verifyOtp,
+        verifyEmailOTPForPassword,
+        resetPassword,
         resendOTP,
       }}
     >

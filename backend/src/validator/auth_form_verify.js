@@ -79,4 +79,20 @@ export const authValidator = {
             .isIn(OTP_PURPOSE),
 
     ],
+    sendOtp: [
+        body("email")
+            .trim()
+            .notEmpty()
+            .withMessage("Email is required")
+            .isEmail()
+            .withMessage("Invalid email"),
+
+
+
+        body("purpose")
+            .notEmpty()
+            .withMessage("purpose is required")
+            .isIn(OTP_PURPOSE),
+
+    ],
 };

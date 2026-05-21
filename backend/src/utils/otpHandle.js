@@ -79,18 +79,14 @@ export async function verifyOtp(email, otp, purpose) {
     expiresAt: null,
   };
 
-  user.isVerified = true;
-
-  await user.save();
-
   return {
     success: true,
     message: "OTP verified",
   };
 }
 
-export const sendVerificationOtp = async (user) => {
-  const otpResult = await createOtp(user.email, "verify_email");
+export const sendVerificationOtp = async (user, purpose) => {
+  const otpResult = await createOtp(user.email, purpose);
 
   if (!otpResult.success) {
     return otpResult;
@@ -108,7 +104,7 @@ export const sendVerificationOtp = async (user) => {
 
   await sendEmail({
     to: user.email,
-    subject: "Your Rank Eats verification code",
+    subject: "to process verify by your email",
     html: `
       <h2>Your verification code</h2>
       <p>Use this code to verify your Rank Eats account:</p>

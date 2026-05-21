@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 export default function UserMenu({ img }) {
   const [open, setOpen] = useState(false)
-  const { logout, userRole } = useUser();
+  const { logout, user } = useUser();
 
 
 
@@ -28,7 +28,7 @@ export default function UserMenu({ img }) {
       {open && (
         <div className="absolute right-0 mt-3 w-48 rounded-lg border bg-white shadow-lg z-[99] overflow-hidden">
 
-          {userRole === "admin" && (
+          {user?.role === "admin" && (
             <>
               <Link to="/admin/dashboard" className="block px-4 py-3 text-sm hover:bg-gray-100">Dashboard</Link>
               <button
@@ -41,7 +41,7 @@ export default function UserMenu({ img }) {
               </button>
             </>
           )}
-          {userRole === "viewer" && (
+          {user?.role === "viewer" && (
             <>
               <Link to="/account" className="block px-4 py-3 text-sm hover:bg-gray-100">Account</Link>
               <Link to="/search/?q=save_listing&source=save-listing" className="block px-4 py-3 text-sm hover:bg-gray-100">Save Listing</Link>
@@ -55,7 +55,7 @@ export default function UserMenu({ img }) {
               </button>
             </>
           )}
-          {userRole === "owner" && (
+          {user?.role === "owner" && (
             <>
               <Link to="/account" className="block px-4 py-3 text-sm hover:bg-gray-100">Account</Link>
               <Link to="/owner/dashboard" className="block px-4 py-3 text-sm hover:bg-gray-100">Dashboard</Link>

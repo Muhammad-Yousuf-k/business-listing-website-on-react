@@ -9,7 +9,7 @@ export const register = async (req, res, next) => {
 
     const existingUser = await userModel.findOne({ email });
 
-    if (existingUser?.isVerified) {
+    if (existingUser) {
       return res.status(400).json({
         success: false,
         message: "User already exists",
@@ -24,7 +24,7 @@ export const register = async (req, res, next) => {
       address,
     });
 
-    const otpResult = await sendVerificationOtp(user);
+    const otpResult = await sendVerificationOtp(user, "verify_email");
 
     if (!otpResult.success) {
       return res.status(400).json(otpResult);
@@ -56,7 +56,7 @@ export const login = async (req, res, next) => {
     }
 
     if (!user.isVerified) {
-      const otpResult = await sendVerificationOtp(user);
+      const otpResult = await sendVerificationOtp(user, "verify_email")
 
       if (!otpResult.success) {
         return res.status(400).json(otpResult);
@@ -88,10 +88,10 @@ export const login = async (req, res, next) => {
 };
 
 /* verify otp */
-export const otpVerify = async (req, res, next) => {
+export const OtpVerify = async (req, res, next) => {
 
   try {
-    const { email, otp, purpose } = req.body
+    const { email, otp, purpose, newPassword } = req.body
     const result = await verifyOtp(email, otp, purpose)
     if (!result.success) {
       return res.status(401).json({
@@ -99,6 +99,16 @@ export const otpVerify = async (req, res, next) => {
         message: result.message,
       });
     }
+    const user = await userModel.findOne({ email });
+
+    if (purpose === "verify_email") {
+      user.isVerified = true;
+      await user.save();
+    } else if (purpose === "reset_password" || newPassword) {
+      user.password = newPassword;
+      await user.save();
+    }
+
     res.status(200).json({
       success: true,
       message: result.message
@@ -108,10 +118,10 @@ export const otpVerify = async (req, res, next) => {
   }
 };
 
-/* RESEND OTP */
-export const resendOTP = async (req, res, next) => {
+/* SEND OTP */
+export const sendOtp = async (req, res, next) => {
   try {
-    const { email } = req.body;
+    const { email, purpose } = req.body;
 
     const user = await userModel.findOne({ email });
 
@@ -122,14 +132,7 @@ export const resendOTP = async (req, res, next) => {
       });
     }
 
-    if (user?.isVerified) {
-      return res.status(400).json({
-        success: false,
-        message: "Email already verified",
-      });
-    }
-
-    const otpResult = await sendVerificationOtp(user);
+    const otpResult = await sendVerificationOtp(user, purpose)
 
     if (!otpResult?.success) {
       return res.status(400).json(otpResult);
@@ -137,42 +140,7 @@ export const resendOTP = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "OTP resent successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const resetPassword = async (req, res, next) => {
-  try {
-    const { email } = req.body;
-
-    const user = await userModel.findOne({ email });
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    if (user?.isVerified) {
-      return res.status(400).json({
-        success: false,
-        message: "Email already verified",
-      });
-    }
-
-    const otpResult = await sendVerificationOtp(user);
-
-    if (!otpResult?.success) {
-      return res.status(400).json(otpResult);
-    }
-
-    res.status(200).json({
-      success: true,
-      message: "OTP resent successfully",
+      message: "OTP sent successfully",
     });
   } catch (error) {
     next(error);

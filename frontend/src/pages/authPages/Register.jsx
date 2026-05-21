@@ -3,24 +3,10 @@ import { Link, useNavigate } from "react-router-dom"
 import { useUser } from "../../hooks/useUser"
 import { toast } from "react-toastify"
 import { Register_Form_Verificaton } from "../../validator/auth_form_verify"
+import RoleCard from "../../components/RoleCard"
+import Icon from "../../components/Icon"
+import Field from "../../components/Field"
 
-/* ─── Icons ──────────────────────────────────────────────────── */
-const Icon = ({ name, size = 16 }) => {
-  const icons = {
-    eye: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>,
-    eyeOff: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg>,
-    mail: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>,
-    user: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>,
-    lock: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0110 0v4" /></svg>,
-    mapPin: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" /></svg>,
-    shield: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>,
-    store: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>,
-    check: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>,
-    chevron: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>,
-    trophy: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="8 21 12 17 16 21" /><line x1="12" y1="17" x2="12" y2="11" /><path d="M7 4h10v5a5 5 0 01-10 0V4z" /><path d="M17 5h2a2 2 0 012 2v2a4 4 0 01-4 4" /><path d="M7 5H5a2 2 0 00-2 2v2a4 4 0 004 4" /></svg>,
-  }
-  return icons[name] || null
-}
 
 /* ─── Left panel content ─────────────────────────────────────── */
 const FEATURES = [
@@ -35,60 +21,6 @@ const STATS = [
   { value: "480K+", label: "Reviews" },
 ]
 
-/* ─── Role option card ───────────────────────────────────────── */
-const RoleCard = ({ value, label, desc, icon, selected, onSelect }) => (
-  <button
-    type="button"
-    onClick={() => onSelect(value)}
-    className="flex items-start gap-3 p-3.5 rounded-xl text-left w-full"
-    style={{
-      backgroundColor: selected ? "rgba(241,89,42,0.07)" : "#fff",
-      border: `1.5px solid ${selected ? "#F1592A" : "#e5e7eb"}`,
-      cursor: "pointer",
-      transition: "border-color 0.15s, background 0.15s",
-    }}
-  >
-    <span
-      className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-      style={{
-        backgroundColor: selected ? "rgba(241,89,42,0.15)" : "#f3f4f6",
-        color: selected ? "#F1592A" : "#9ca3af",
-        transition: "background 0.15s, color 0.15s",
-      }}
-    >
-      <Icon name={icon} size={15} />
-    </span>
-    <div className="flex-1 min-w-0">
-      <p className="text-sm font-bold leading-none mb-0.5" style={{ color: selected ? "#F1592A" : "#1a1a1a" }}>{label}</p>
-      <p className="text-xs leading-snug" style={{ color: "#9ca3af" }}>{desc}</p>
-    </div>
-    <span
-      className="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5"
-      style={{ borderColor: selected ? "#F1592A" : "#d1d5db", backgroundColor: selected ? "#F1592A" : "transparent" }}
-    >
-      {selected && <Icon name="check" size={10} />}
-    </span>
-  </button>
-)
-
-/* ─── Input field ────────────────────────────────────────────── */
-const Field = ({ label, optional, error, icon, children }) => (
-  <div className="flex flex-col gap-1.5">
-    <label className="text-sm font-semibold flex items-center gap-1.5" style={{ color: "#374151" }}>
-      {label}
-      {optional && <span className="text-xs font-normal" style={{ color: "#9ca3af" }}>(optional)</span>}
-    </label>
-    <div className="relative">
-      {icon && (
-        <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: "#9ca3af" }}>
-          <Icon name={icon} size={15} />
-        </span>
-      )}
-      {children}
-    </div>
-    {error && <p className="text-xs font-medium" style={{ color: "#ef4444" }}>{error}</p>}
-  </div>
-)
 
 /* ─── Shared input style fn ──────────────────────────────────── */
 const inputStyle = (hasIcon = true, hasError = false) => ({
@@ -131,36 +63,31 @@ const Register = () => {
 
   const setRole = (val) => setForm(p => ({ ...p, role: val }))
 
-  /* Client-side field errors */
-  const validate = () => {
-    const e = {}
-    if (!form.name.trim()) e.name = "Name is required."
-    if (!form.email.trim()) e.email = "Email is required."
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = "Enter a valid email."
-    if (!form.password || form.password.length < 6) e.password = "Password must be at least 6 characters."
-    return e
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     // validator from your file
     const formErr = Register_Form_Verificaton(form)
-    if (formErr) { toast.error(formErr); return }
-
-    // field-level errors
-    const fieldErr = validate()
-    if (Object.keys(fieldErr).length) { setErrors(fieldErr); return }
-
+    if (formErr) {
+      toast.error(formErr);
+      setErrors(formErr)
+      return
+    }
     setSubmitting(true)
+
     try {
       const ok = await register(form)
       if (ok) {
         toast.info("Check your email to verify your account before logging in.")
-        navigate("/verify-otp", { state: { email: form.email } })
+        navigate("/verify-otp", {
+          state: {
+            email: form.email,
+            purpose: "verify_email",
+          }
+        })
+
       }
-    } catch (err) {
-      toast.error(err?.message || "Registration failed. Please try again.")
     } finally {
       setSubmitting(false)
     }
@@ -317,43 +244,43 @@ const Register = () => {
                 </div>
               </div>
 
-             
-                <div className="flex flex-col gap-3 p-4 rounded-xl" style={{ backgroundColor: "#fdf9f7", border: "1px solid #f0ede8" }}>
-                  <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "#9ca3af" }}>Restaurant Location</p>
-                  <Field label="Country" optional icon="mapPin">
+
+              <div className="flex flex-col gap-3 p-4 rounded-xl" style={{ backgroundColor: "#fdf9f7", border: "1px solid #f0ede8" }}>
+                <p className="text-xs font-bold uppercase tracking-wider" style={{ color: "#9ca3af" }}>Restaurant Location</p>
+                <Field label="Country" optional icon="mapPin">
+                  <input
+                    type="text"
+                    placeholder="e.g. United States"
+                    value={form.address.country}
+                    onChange={setAddr("country")}
+                    className="auth-input"
+                    style={inputStyle(true, false)}
+                  />
+                </Field>
+                <div className="grid grid-cols-2 gap-3">
+                  <Field label="State">
                     <input
                       type="text"
-                      placeholder="e.g. United States"
-                      value={form.address.country}
-                      onChange={setAddr("country")}
+                      placeholder="e.g. New York"
+                      value={form.address.state}
+                      onChange={setAddr("state")}
                       className="auth-input"
-                      style={inputStyle(true, false)}
+                      style={inputStyle(false, false)}
                     />
                   </Field>
-                  <div className="grid grid-cols-2 gap-3">
-                    <Field label="State">
-                      <input
-                        type="text"
-                        placeholder="e.g. New York"
-                        value={form.address.state}
-                        onChange={setAddr("state")}
-                        className="auth-input"
-                        style={inputStyle(false, false)}
-                      />
-                    </Field>
-                    <Field label="City">
-                      <input
-                        type="text"
-                        placeholder="e.g. Brooklyn"
-                        value={form.address.city}
-                        onChange={setAddr("city")}
-                        className="auth-input"
-                        style={inputStyle(false, false)}
-                      />
-                    </Field>
-                  </div>
+                  <Field label="City">
+                    <input
+                      type="text"
+                      placeholder="e.g. Brooklyn"
+                      value={form.address.city}
+                      onChange={setAddr("city")}
+                      className="auth-input"
+                      style={inputStyle(false, false)}
+                    />
+                  </Field>
                 </div>
-              
+              </div>
+
 
               {/* Password */}
               <div className="flex flex-col gap-1.5">

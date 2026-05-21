@@ -14,16 +14,17 @@ const colors = {
 };
 
 export default function OTPVerify() {
-    const { verifyOTP, resendOTP } = useUser();
+    const { verifyOtp, resendOTP } = useUser();
     const navigate = useNavigate();
 
     const [otp, setOtp] = useState(Array(6).fill(""));
     const [status, setStatus] = useState("idle"); // idle | loading | success | error
-    const [shake, setShake] = useState(false);
     const [focusedIndex, setFocusedIndex] = useState(null);
     const inputRefs = useRef([]);
     const location = useLocation();
-    const email = location.state?.email;
+    const email = location?.state?.email;
+    const purpose = location?.state?.purpose;
+    const newPassword = location?.state?.newPassword || "";
 
     useEffect(() => {
         inputRefs.current[0]?.focus();
@@ -74,15 +75,14 @@ export default function OTPVerify() {
 
         const finalOtp = otp.join('');
         // function to verify OTP goes here, using finalOtp variable
-        let result = await verifyOTP(email, finalOtp, "verify_email");
+        let result = await verifyOtp(email, finalOtp, purpose, newPassword);
 
-        if (!result) {
-            toast.error("somthing went wrong, plz click resend Otp")
-            setStatus("error")
+        if (result) {
+            setStatus("success")
+            navigate("/login")
         }
+        setStatus("error")
 
-        navigate("/login")
-        setStatus("success")
     };
 
     const handleResend = () => {
@@ -90,7 +90,7 @@ export default function OTPVerify() {
         setStatus("idle");
         inputRefs.current[0]?.focus();
         // function to resend OTP goes here
-        resendOTP(email, "verify_email");
+        resendOTP(email, purpose);
     };
 
     const isFilled = otp.every((d) => d !== "");
@@ -149,8 +149,8 @@ export default function OTPVerify() {
 
                     {/* OTP Inputs */}
                     <div
-                        className={`flex justify-center gap-3 mb-6 ${shake ? "animate-shake" : ""}`}
-                        style={shake ? { animation: "shake 0.45s ease" } : {}}
+                        className={`flex justify-center gap-3 mb-6 `}
+                        
                     >
                         {otp.map((digit, i) => {
                             const isFocused = focusedIndex === i;
@@ -273,19 +273,7 @@ export default function OTPVerify() {
                 </div>
             </div>
 
-            <style>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          18% { transform: translateX(-6px); }
-          36% { transform: translateX(6px); }
-          54% { transform: translateX(-4px); }
-          72% { transform: translateX(4px); }
-          90% { transform: translateX(-2px); }
-        }
-        .animate-shake {
-          animation: shake 0.45s ease;
-        }
-      `}</style>
+            
         </div>
     );
 }
