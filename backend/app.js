@@ -11,6 +11,7 @@ import restaurant_routes from "./src/routes/restaurant.routes.js";
 import review_routes from "./src/routes/review.routes.js";
 import menu_routes from "./src/routes/menu.routes.js";
 import search_routes from "./src/routes/search_routes.js";
+import form_routes from "./src/routes/form_routes.js";
 import csrfProtection from "./src/middlewares/csrf.middleware.js";
 
 import { env } from "./src/config/env.js";
@@ -22,29 +23,33 @@ const app = express();
 /* SECURITY */
 app.use(helmet());
 app.use(cookieParser());
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+app.use(compression());
 
-app.set("trust proxy", 1);
-// ssss
+if (env.nodeEnv === "production") {
+    app.set("trust proxy", 1);
+}
+
 /* CORS */
 const allowedOrigins = [
-    "https://rankeats.netlify.app",
+    env.clientUrl,
     "http://localhost:5173",
-];
+].filter(Boolean);
 
 app.use(
     cors({
-        origin: allowedOrigins,
+        origin(origin, callback) {
+            if (!origin || allowedOrigins.includes(origin)) {
+                return callback(null, true);
+            }
+
+            return callback(null, false);
+        },
         credentials: true,
     })
 );
 
-
-/* BODY PARSER */
-app.use(express.json({ limit: "1mb" }));
-app.use(express.urlencoded({ extended: true }));
-
-/* COMPRESSION */
-app.use(compression());
 
 /* LOGGING */
 if (env.nodeEnv === "development") {
@@ -57,7 +62,12 @@ if (env.nodeEnv !== "development") {
         rateLimit({
             windowMs: 15 * 60 * 1000,
             max: 100,
-            message: "Too many requests, please try again later.",
+            standardHeaders: true,
+            legacyHeaders: false,
+            message: {
+                success: false,
+                message: "Too many requests, please try again later.",
+            },
         })
     );
 
@@ -85,6 +95,7 @@ app.use("/restaurant-api", restaurant_routes);
 app.use("/review-api", review_routes);
 app.use("/menu-api", menu_routes);
 app.use("/search-api", search_routes);
+app.use("/form-api", form_routes);
 
 /* ERROR HANDLING */
 app.use(notFound);

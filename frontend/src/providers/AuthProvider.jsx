@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "../api/interceptors";
-import { setCsrfToken } from "../api/csrf";
 import { AuthContext } from "../context/AuthContext";
-import { markAuthChecked } from "../api/interceptors";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { initCsrf } from "../api/initCsrf";
 
 const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
@@ -26,8 +25,7 @@ const AuthProvider = ({ children }) => {
 
       try {
         // 1. CSRF token
-        const csrfRes = await api.get("/csrf-token");
-        setCsrfToken(csrfRes.data.csrfToken);
+        await initCsrf();
 
         // 2. Check user from cookie
         const res = await api.get("/auth-api/checkUser");
@@ -45,7 +43,6 @@ const AuthProvider = ({ children }) => {
         // setError(err);
       } finally {
         setLoading(false);
-        markAuthChecked();
       }
     };
 
@@ -169,39 +166,6 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-
-
-
-  /* verify OTP */
-  const verifyEmailOTPForPassword = async (email, otp, purpose, NewPassword) => {
-    setLoading(true);
-
-    try {
-      const res = await api.post("/auth-api/reset-password-verify", {
-        email,
-        otp,
-        purpose,
-        NewPassword,
-      });
-      setSuccess(res);
-
-      setError(null);
-
-      return true;
-    } catch (err) {
-      setError(err);
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-
-
-
-
-
   const handleUpdateRole = async (role) => {
     try {
       if (user?.role === role) {
@@ -209,7 +173,7 @@ const AuthProvider = ({ children }) => {
         return;
       }
 
-      const res = await api.post("/auth-api/update-role", {
+      const res = await api.put("/auth-api/update-role", {
         role,
       });
 
@@ -231,7 +195,7 @@ const AuthProvider = ({ children }) => {
         return;
       }
 
-      const res = await api.post("/auth-api/update-avatar", form);
+      const res = await api.put("/auth-api/update-avatar", form);
 
       setUser((prev) => ({
         ...prev,
@@ -240,7 +204,7 @@ const AuthProvider = ({ children }) => {
 
       setSuccess(res);
     } catch (error) {
-      setError(error || "Role updated failed");
+      setError(error || "Avatar updated failed");
     }
   };
 
@@ -269,6 +233,10 @@ const AuthProvider = ({ children }) => {
     successHandler(success)
   }, [error, success])
 
+  useEffect(() => {
+    console.log(user)
+  }, [user])
+
 
   return (
     <AuthContext.Provider
@@ -285,7 +253,6 @@ const AuthProvider = ({ children }) => {
         register,
         logout,
         verifyOtp,
-        verifyEmailOTPForPassword,
         sendOtp,
       }}
     >

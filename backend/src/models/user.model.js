@@ -75,12 +75,18 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
+
+        saveListings: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Restaurant",
+            },
+        ],
     },
     { timestamps: true, }
 );
 
 // Create an index for RestaurantsId to improve query performance
-// userSchema.index({ email: 1 });  // Index on email field
 
 // Hash password before save
 userSchema.pre("save", async function () {

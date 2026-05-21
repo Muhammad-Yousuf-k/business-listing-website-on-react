@@ -8,6 +8,7 @@ const ButtonTwo = ({
   iconName = null,
   iconSize = 15,
   path = "",
+  loading = false,
   onClick = null,
   isSubmited = false,
   isSubmitedText = "Submitted"

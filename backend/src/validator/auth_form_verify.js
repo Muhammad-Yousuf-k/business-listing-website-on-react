@@ -1,6 +1,5 @@
 import { body } from "express-validator";
 import { OTP_PURPOSE } from "../constant/AUTH_CONSTANT.js";  // Corrected import with .js extension
-import { userModel } from "../models/user.model.js";  // Corrected import with .js extension
 
 // Auth validator (example for login/register)
 export const authValidator = {
@@ -60,6 +59,24 @@ export const authValidator = {
 
     ],
 
+    updateAvatar: [
+
+        body("avatar")
+            .notEmpty()
+            .withMessage("Avatar is required"),
+
+    ],
+
+    updateRole: [
+
+        body("role")
+            .notEmpty()
+            .withMessage("Role is required")
+            .isIn(["viewer", "owner"])
+            .withMessage("Invalid role"),
+
+    ],
+
     otp: [
         body("email")
             .trim()
@@ -79,6 +96,7 @@ export const authValidator = {
             .isIn(OTP_PURPOSE),
 
     ],
+
     sendOtp: [
         body("email")
             .trim()

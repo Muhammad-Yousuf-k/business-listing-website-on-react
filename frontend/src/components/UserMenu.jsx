@@ -4,7 +4,7 @@ import { useUser } from "../hooks/useUser";
 import { Link } from "react-router-dom";
 
 
-export default function UserMenu({ img }) {
+export default function UserMenu({ img = "/unknownuser.png" }) {
   const [open, setOpen] = useState(false)
   const { logout, user } = useUser();
 
@@ -19,7 +19,7 @@ export default function UserMenu({ img }) {
       <img
         onClick={() => setOpen(!open)}
         className={`flex h-10 w-10 items-center justify-center rounded-full`}
-        src={img == false ? "/unknownuser.png" : img}
+        src={img}
       />
       <User size={20} />
 

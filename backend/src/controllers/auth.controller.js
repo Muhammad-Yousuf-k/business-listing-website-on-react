@@ -48,7 +48,15 @@ export const login = async (req, res, next) => {
       .findOne({ email })
       .select("+password");
 
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User Not Found",
+      });
+
+    }
+
+    if (!(await user.comparePassword(password))) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials",
@@ -87,6 +95,82 @@ export const login = async (req, res, next) => {
   }
 };
 
+/* UPDATE ROLE */
+export const updateRole = async (req, res, next) => {
+  try {
+    const { role } = req.body;
+    const { _id } = req.user;
+
+    const user = await userModel.findOne({ _id })
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User Not Found",
+      });
+
+    }
+
+    user.role = role;
+    await user.save();
+
+
+    res.status(200).json({
+      success: true,
+      message: "Role updated successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role,
+        address: user.address,
+        isVerified: user.isVerified,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/* UPDATE AVATAR */
+export const updateAvatar = async (req, res, next) => {
+  try {
+    const { avatar } = req.body;
+    const { _id } = req.user;
+
+    const user = await userModel.findOne({ _id })
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "User Not Found",
+      });
+
+    }
+
+    user.avatar = avatar;
+    await user.save();
+
+
+    res.status(200).json({
+      success: true,
+      message: "Avatar updated successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        avatar: user.avatar,
+        role: user.role,
+        address: user.address,
+        isVerified: user.isVerified,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 
 /* verify otp */
 export const OtpVerify = async (req, res, next) => {
@@ -105,9 +189,13 @@ export const OtpVerify = async (req, res, next) => {
     if (purpose === "verify_email") {
       user.isVerified = true;
       await user.save();
-    } else if (purpose === "reset_password" || newPassword) {
-      user.password = newPassword;
-      await user.save();
+    }
+
+    if (purpose === "reset_password") {
+      if (!newPassword) {
+        user.password = newPassword;
+        await user.save();
+      }
     }
 
     res.status(200).json({
@@ -169,11 +257,18 @@ export const checkUser = async (req, res, next) => {
   try {
     res.status(200).json({
       success: true,
-      successCode: "345225",
       message: "User data",
-      user: req.user,
+      user: {
+        id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        avatar: req.user.avatar,
+        role: req.user.role,
+        address: req.user.address,
+        isVerified: req.user.isVerified,
+      },
     });
   } catch (error) {
-    next(error);  // Pass the error to the error handler middleware
+    next(error);
   }
 };

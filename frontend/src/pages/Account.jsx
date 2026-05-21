@@ -112,8 +112,6 @@ export default function Account() {
 
       await handleUpdateAvatar(form)
       setAvatarFile(null)
-    } catch (error) {
-      toast.error(error?.response?.data?.message || "Failed to upload avatar")
     } finally {
       setAvatarLoading(false)
     }
@@ -190,11 +188,7 @@ export default function Account() {
               </button>
 
               {avatarFile && (
-                <SaveBtn
-                  loading={avatarLoading}
-                  label="Upload Photo"
-                  onClick={sendAvatarFile}
-                />
+                <ButtonTwo loading={avatarLoading} onClick={sendAvatarFile} title="Upload Photo" />
               )}
 
               <p className="text-xs text-[#c4bfba]">JPG or PNG, max 2MB</p>
