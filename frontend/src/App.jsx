@@ -19,6 +19,7 @@ import CreateListing from "./pages/dashboardPages/CreateListing";
 import EditListing from "./pages/dashboardPages/EditListing";
 import AdvertisePage from "./pages/AdvertisePage";
 import Test from "./pages/test";
+import ResetPassword from "./pages/authPages/ResetPassword";
 
 import NotForLoggedUserRoute from "./routes/NotForLoggedUserRoute";
 // import ProtectedRoute from "./routes/ProtectedRoute";
@@ -91,6 +92,14 @@ const App = () => {
             element={
               <NotForLoggedUserRoute>
                 {renderWithLayout(<VerifyOTP />)}
+              </NotForLoggedUserRoute>
+            }
+          />
+          <Route
+            path="/reset-password"
+            element={
+              <NotForLoggedUserRoute>
+                {renderWithLayout(<ResetPassword />)}
               </NotForLoggedUserRoute>
             }
           />

@@ -7,7 +7,7 @@ import Btnone from './small compo/Btn-one'
 import Btntwo from './small compo/Btn-two'
 import ButtonOne from './ButtonOne'
 import ButtonTwo from './ButtonTwo'
-import AvatarDropdownComponent from './AvatarDropdownComponent'
+import UserMenu from './UserMenu'
 import { useUser } from '../hooks/useUser'
 
 const STATES = [
@@ -243,7 +243,7 @@ export default function Header() {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
             {isLoggedIn ? (
-              <AvatarDropdownComponent img={userAvatar} />
+              <UserMenu img={userAvatar} />
             ) : (
               <>
                 <ButtonOne title='Login' path="/login" isInverted={true} />
@@ -272,7 +272,7 @@ export default function Header() {
             {/* Avatar row (if logged in) */}
             {isLoggedIn && (
               <div className="mb-3 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                <AvatarDropdownComponent img={userAvatar} />
+                <UserMenu img={userAvatar} />
               </div>
             )}
 

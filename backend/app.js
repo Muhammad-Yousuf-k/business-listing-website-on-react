@@ -71,6 +71,8 @@ app.get("/csrf-token", csrfProtection, (req, res) => {
     });
 });
 
+app.get("/favicon.ico", (req, res) => res.status(204).end());
+
 /* ROUTES */
 app.use("/auth-api", auth_routes);
 app.use("/restaurant-api", restaurant_routes);

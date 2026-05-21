@@ -75,3 +75,31 @@ export function Login_Form_Verificaton(email, password) {
 
     return null
 }
+
+export function reset_password_email_Form_Verificaton(email, password) {
+    // Helper validators
+
+    if (!isValidEmail(email) || !isRequired(email)) {
+
+        return "email is required"
+
+    }
+
+    return null
+}
+export function reset_password_password_Form_Verificaton(password1, password2) {
+    // Helper validators
+
+    if (!isRequired(password1) || password1.length < 6 || !isRequired(password2) || password2.length < 6) {
+
+        return password1.length < 6 ? "password length must be at least 6" : "password is required"
+
+
+    }
+
+    if (password1 !== password2) {
+        return "Passwords do not match";
+    }
+
+    return null
+}

@@ -2,68 +2,70 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useUser } from "../../hooks/useUser"
 import { toast } from "react-toastify"
-import { Login_Form_Verificaton } from "../../validator/auth_form_verify"
+import { reset_password_email_Form_Verificaton, reset_password_password_Form_Verificaton } from "../../validator/auth_form_verify"
 import Icon from "../../components/Icon"
 import Field from "../../components/Field"
 
-
 /* ─── Features list ──────────────────────────────────────────── */
 const FEATURES = [
-  { icon: "trophy", text: "Manage your restaurant listing, update details, images, and menu from one clean dashboard." },
-  { icon: "users", text: "Reach more hungry customers by appearing in top search results and featured sections." },
-  { icon: "shield", text: "Secure and fast access — your data is protected and your dashboard is always ready." },
+  { icon: "trophy", text: "Enter your email and submit" },
+  { icon: "users", text: "Write New Password and submit" },
+  { icon: "shield", text: "then login" },
 ]
-
-/* ─── Stats ──────────────────────────────────────────────────── */
-const STATS = [
-  { value: "12K+", label: "Listings" },
-  { value: "95K+", label: "Monthly Users" },
-  { value: "480K+", label: "Reviews" },
-]
-
 
 /* ─── Main Component ─────────────────────────────────────────── */
-const Login = () => {
+const ResetPassword = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [reCheckPassword, setReCheckPassword] = useState("")
   const [showPass, setShowPass] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [panel, setPanel] = useState("email")
 
-  const { login, resetPassword } = useUser()
+  const { sendOtp } = useUser()
   const navigate = useNavigate()
 
-  const handleSubmit = async (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault()
-    const err = Login_Form_Verificaton(email, password)
-    if (err) { toast.error(err); return }
-
+    const passwordError = reset_password_password_Form_Verificaton(password, reCheckPassword);
+    if (passwordError) {
+      return toast.error(passwordError);
+    }
     setSubmitting(true)
+
     try {
-      const ok = await login(email, password)
+      const ok = true
       if (ok) {
-        navigate("/")
+        navigate("/verify-otp", {
+          state: {
+            email: email,
+            purpose: "reset_password",
+            newPassword: password,
+          }
+        })
       }
+    } catch (err) {
+      toast.error(err?.message || "Something went wrong.")
     } finally {
       setSubmitting(false)
     }
   }
 
-  async function handleResetPassword() {
-    if (!email || !password) { return toast.error("add your email and new password") }
-    const res = await resetPassword(email)
-
-    if (!res) {
-      toast.error("Something Weng Wrong, try again later")
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault()
+    const emailError = reset_password_email_Form_Verificaton(email);
+    if (emailError) {
+      return toast.error(emailError);
     }
-    if (res) {
-      toast.success("OTP sent to email")
-      navigate("/verify-otp", {
-        state: {
-          email: email,
-          purpose: "reset_password",
-          NewPassword: password,
-        },
-      });
+    setSubmitting(true)
+
+    try {
+      const ok = await sendOtp(email, "reset_password")
+      if (ok) {
+        setPanel("newPassword")
+      }
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -86,7 +88,7 @@ const Login = () => {
 
       {/* ── Left Banner ──────────────────────────────────────── */}
       <div
-        className="hidden lg:flex lg:w-[52%] flex-col justify-between p-12 relative overflow-hidden"
+        className="hidden lg:flex lg:w-[52%] flex-col justify-start p-12 relative overflow-hidden"
         style={{ background: "linear-gradient(160deg, #1a0800 0%, #2d0f00 50%, #0d0d0d 100%)" }}
       >
         {/* Radial glow */}
@@ -108,21 +110,12 @@ const Login = () => {
         </div>
 
         {/* Main content */}
-        <div className="relative z-10 flex flex-col gap-8">
+        <div className="relative z-10 flex flex-col justify-start gap-8">
           <div>
-            <span
-              className="inline-block text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full mb-5"
-              style={{ backgroundColor: "rgba(241,89,42,0.18)", color: "#F1592A", border: "1px solid rgba(241,89,42,0.3)" }}
-            >
-              Restaurant Platform
-            </span>
             <h1 className="exo-2 font-bold text-white leading-tight mb-3" style={{ fontSize: "clamp(1.8rem, 3vw, 2.6rem)" }}>
-              Welcome back to<br />
-              <span style={{ color: "#F1592A" }}>Rank Eats</span>
+              Reset Your<br />
+              <span style={{ color: "#F1592A" }}>Password</span>
             </h1>
-            <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.6)", maxWidth: "340px" }}>
-              Sign in to manage your listings, track performance, and reach more hungry customers every day.
-            </p>
           </div>
 
           {/* Features */}
@@ -140,24 +133,10 @@ const Login = () => {
             ))}
           </div>
 
-          {/* Stats row */}
-          <div
-            className="flex gap-8 pt-6"
-            style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
-          >
-            {STATS.map(s => (
-              <div key={s.label} className="flex flex-col gap-0.5">
-                <span className="exo-2 font-bold text-xl" style={{ color: "#F1592A" }}>{s.value}</span>
-                <span className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{s.label}</span>
-              </div>
-            ))}
-          </div>
+
         </div>
 
-        {/* Bottom note */}
-        <p className="relative z-10 text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
-          Trusted by restaurant owners across the country
-        </p>
+
       </div>
 
       {/* ── Right Form Panel ─────────────────────────────────── */}
@@ -174,10 +153,10 @@ const Login = () => {
           {/* Heading */}
           <div className="mb-8">
             <h2 className="exo-2 font-bold text-2xl mb-1" style={{ color: "#1a1a1a" }}>
-              Sign in to your account
+              Reset Password to your account
             </h2>
             <p className="text-sm" style={{ color: "#9ca3af" }}>
-              Welcome back — let's get you logged in.
+              Welcome back — let's get your Reset Password
             </p>
           </div>
 
@@ -186,22 +165,23 @@ const Login = () => {
             className="rounded-2xl p-7 flex flex-col gap-5"
             style={{ backgroundColor: "#fff", border: "1.5px solid #f0ede8", boxShadow: "0 4px 24px rgba(0,0,0,0.06)" }}
           >
-            <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-              {/* Email */}
-              <Field label="Email Address" icon="mail">
-                <input
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  className="auth-input"
-                  required
-                  autoComplete="email"
-                />
-              </Field>
+            {panel === "email" && (
+              <form onSubmit={handleEmailSubmit} className="flex flex-col gap-5">
+                {/* Email */}
+                <Field label="Email Address" icon="mail">
+                  <input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="auth-input"
+                    required
+                    autoComplete="email"
+                  />
+                </Field>
 
-              {/* Password */}
-              <Field label="Password" icon="lock">
+                {/* Password */}
+                {/* <Field label="Password" icon="lock">
                 <input
                   type={showPass ? "text" : "password"}
                   placeholder="Enter your password"
@@ -214,53 +194,71 @@ const Login = () => {
                 <button type="button" className="eye-btn" onClick={() => setShowPass(p => !p)} tabIndex={-1}>
                   <Icon name={showPass ? "eyeOff" : "eye"} size={16} />
                 </button>
-              </Field>
+              </Field> */}
 
-              {/* Forgot password */}
-              <div className="flex justify-end -mt-2">
-                <Link
-                to="/reset-password"
-                  className="text-xs font-semibold"
-                  style={{ color: "#F1592A", textDecoration: "none" }}
-                  onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
-                  onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}
-                >
-                  Forgot password?
-                </Link>
-              </div>
 
-              {/* Submit */}
-              <button type="submit" disabled={submitting} className="login-btn">
-                {submitting
-                  ? <span className="flex items-center justify-center gap-2">
-                    <span style={{ width: 15, height: 15, border: "2px solid rgba(255,255,255,0.35)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
-                    Logging in...
-                  </span>
-                  : "Log in"
-                }
-              </button>
-            </form>
 
-            {/* Divider */}
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-px" style={{ backgroundColor: "#f0ede8" }} />
-              <span className="text-xs" style={{ color: "#c4bfba" }}>or</span>
-              <div className="flex-1 h-px" style={{ backgroundColor: "#f0ede8" }} />
-            </div>
+                {/* Submit */}
+                <button type="submit" disabled={submitting} className="login-btn">
+                  {submitting
+                    ? <span className="flex items-center justify-center gap-2">
+                      <span style={{ width: 15, height: 15, border: "2px solid rgba(255,255,255,0.35)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
+                      Logging in...
+                    </span>
+                    : "Log in"
+                  }
+                </button>
+              </form>
+            )}
+            {panel === "newPassword" && (
+              <form onSubmit={handlePasswordSubmit} className="flex flex-col gap-5">
 
-            {/* Register CTA */}
-            <p className="text-center text-sm" style={{ color: "#6b7280" }}>
-              New to Rank Eats?{" "}
-              <Link
-                to="/register"
-                className="font-bold"
-                style={{ color: "#F1592A", textDecoration: "none" }}
-                onMouseEnter={e => e.currentTarget.style.textDecoration = "underline"}
-                onMouseLeave={e => e.currentTarget.style.textDecoration = "none"}
-              >
-                Create a free account
-              </Link>
-            </p>
+                {/* Password */}
+                <Field label="Password" icon="lock">
+                  <input
+                    type={showPass ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    className="auth-input pr-extra"
+                    required
+                    autoComplete="current-password"
+                  />
+                  <button type="button" className="eye-btn" onClick={() => setShowPass(p => !p)} tabIndex={-1}>
+                    <Icon name={showPass ? "eyeOff" : "eye"} size={16} />
+                  </button>
+                </Field>
+                <Field label="re Check Password" icon="lock">
+                  <input
+                    type={showPass ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={reCheckPassword}
+                    onChange={e => setReCheckPassword(e.target.value)}
+                    className="auth-input pr-extra"
+                    required
+                    autoComplete="current-password"
+                  />
+                  <button type="button" className="eye-btn" onClick={() => setShowPass(p => !p)} tabIndex={-1}>
+                    <Icon name={showPass ? "eyeOff" : "eye"} size={16} />
+                  </button>
+                </Field>
+
+
+
+                {/* Submit */}
+                <button type="submit" disabled={submitting} className="login-btn">
+                  {submitting
+                    ? <span className="flex items-center justify-center gap-2">
+                      <span style={{ width: 15, height: 15, border: "2px solid rgba(255,255,255,0.35)", borderTopColor: "#fff", borderRadius: "50%", display: "inline-block", animation: "spin 0.7s linear infinite" }} />
+                      Submiting...
+                    </span>
+                    : "Submit"
+                  }
+                </button>
+              </form>
+            )}
+
+
           </div>
 
           {/* Trust note */}
@@ -284,4 +282,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default ResetPassword

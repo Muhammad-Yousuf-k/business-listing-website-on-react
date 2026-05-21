@@ -147,24 +147,7 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  const resetPassword = async (email) => {
-    try {
-
-      const res = await api.post("/auth-api/reset-password", {
-        email
-      });
-
-
-      setSuccess(res);
-      return true
-    } catch (error) {
-      setError(error || "Role updated failed");
-      return false
-    }
-  };
-
-
-  const resendOTP = async (email, purpose) => {
+  const sendOtp = async (email, purpose) => {
     setLoading(true);
 
     try {
@@ -174,7 +157,9 @@ const AuthProvider = ({ children }) => {
       });
 
       setError(null);
-      setSuccess(res || "OTP Resend");
+      if (purpose !== "reset_password") {
+        setSuccess(res || "OTP Resend");
+      }
       return true;
     } catch (err) {
       setError(err || "OTP resend failed");
@@ -301,8 +286,7 @@ const AuthProvider = ({ children }) => {
         logout,
         verifyOtp,
         verifyEmailOTPForPassword,
-        resetPassword,
-        resendOTP,
+        sendOtp,
       }}
     >
       {children}

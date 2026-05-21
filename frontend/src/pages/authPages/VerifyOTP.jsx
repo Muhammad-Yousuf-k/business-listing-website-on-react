@@ -14,7 +14,7 @@ const colors = {
 };
 
 export default function OTPVerify() {
-    const { verifyOtp, resendOTP } = useUser();
+    const { verifyOtp, sendOtp } = useUser();
     const navigate = useNavigate();
 
     const [otp, setOtp] = useState(Array(6).fill(""));
@@ -78,10 +78,11 @@ export default function OTPVerify() {
         let result = await verifyOtp(email, finalOtp, purpose, newPassword);
 
         if (result) {
-            setStatus("success")
             navigate("/login")
+            setStatus("success")
+        } else {
+            setStatus("error")
         }
-        setStatus("error")
 
     };
 
@@ -90,7 +91,7 @@ export default function OTPVerify() {
         setStatus("idle");
         inputRefs.current[0]?.focus();
         // function to resend OTP goes here
-        resendOTP(email, purpose);
+        sendOtp(email, purpose);
     };
 
     const isFilled = otp.every((d) => d !== "");
@@ -150,7 +151,7 @@ export default function OTPVerify() {
                     {/* OTP Inputs */}
                     <div
                         className={`flex justify-center gap-3 mb-6 `}
-                        
+
                     >
                         {otp.map((digit, i) => {
                             const isFocused = focusedIndex === i;
@@ -273,7 +274,7 @@ export default function OTPVerify() {
                 </div>
             </div>
 
-            
+
         </div>
     );
 }
