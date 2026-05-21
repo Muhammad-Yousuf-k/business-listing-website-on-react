@@ -26,15 +26,19 @@ app.use(cookieParser());
 app.set("trust proxy", 1);
 // ssss
 /* CORS */
+const allowedOrigins = [
+    "https://rankeats.netlify.app",
+    "http://localhost:5173",
+];
+
 app.use(
     cors({
-        origin: [
-            "https://rankeats.netlify.app/",
-            "http://localhost:5173/",
-        ],
+        origin: allowedOrigins,
         credentials: true,
     })
 );
+
+app.options("*", cors());
 
 /* BODY PARSER */
 app.use(express.json({ limit: "1mb" }));
