@@ -29,8 +29,8 @@ app.set("trust proxy", 1);
 app.use(
     cors({
         origin: [
-            env.clientUrl,
-            "https://6a0f4e5637226fb3208574a0--rankeats.netlify.app",
+            "https://rankeats.netlify.app/",
+            "http://localhost:5173/",
         ],
         credentials: true,
     })
