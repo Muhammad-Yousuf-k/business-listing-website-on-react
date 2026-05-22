@@ -109,8 +109,6 @@ const AuthProvider = ({ children }) => {
       const res = await api.post("/auth-api/logout");
 
       setUser(null);
-      setUserRole(null);
-      setUserAvatar(null);
       setError(null);
       setSuccess(res);
     } catch (err) {
@@ -191,20 +189,57 @@ const AuthProvider = ({ children }) => {
   const handleUpdateAvatar = async (form) => {
     try {
       if (!form) {
-        toast.error("image not found");
+        toast.error("Image not found");
         return;
       }
 
-      const res = await api.put("/auth-api/update-avatar", form);
+      // for (let pair of form.entries()) {
+      //   console.log(pair[0], pair[1]);
+      // }
+
+      const res = await api.put(
+        "/auth-api/update-avatar",
+        form,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
 
       setUser((prev) => ({
         ...prev,
         avatar: res?.data?.avatar || "",
       }));
 
-      setSuccess(res);
+      toast.success("Avatar updated successfully");
     } catch (error) {
-      setError(error || "Avatar updated failed");
+      console.error(error);
+
+      toast.error(
+        error?.response?.data?.message ||
+        "Avatar update failed"
+      );
+
+      setError(error);
+    }
+  };
+
+
+  const handleContactForm = async (form) => {
+    try {
+      if (!form) {
+        toast.error("form not found");
+        return;
+      }
+
+      const res = await api.post("/form-api/contact-form", form,);
+
+      setSuccess(res || "Contact form submitted successfully");
+
+    } catch (error) {
+      setError(error);
     }
   };
 
@@ -244,11 +279,12 @@ const AuthProvider = ({ children }) => {
         user,
         userRole,
         userAvatar,
-        handleUpdateRole,
-        handleUpdateAvatar,
         isLoggedIn,
         loading,
         error,
+        handleUpdateRole,
+        handleUpdateAvatar,
+        handleContactForm,
         login,
         register,
         logout,

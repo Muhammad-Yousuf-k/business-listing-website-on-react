@@ -1,6 +1,7 @@
 import { userModel } from "../models/user.model.js";
 import saveToken from "../utils/saveToken.js";
 import { verifyOtp, sendVerificationOtp } from "../utils/otpHandle.js";
+import cloudinary from "../config/cloudinary.js";
 
 /* REGISTER */
 export const register = async (req, res, next) => {
@@ -118,15 +119,7 @@ export const updateRole = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Role updated successfully",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        avatar: user.avatar,
-        role: user.role,
-        address: user.address,
-        isVerified: user.isVerified,
-      },
+      role: user.role,
     });
   } catch (error) {
     next(error);
@@ -136,35 +129,27 @@ export const updateRole = async (req, res, next) => {
 /* UPDATE AVATAR */
 export const updateAvatar = async (req, res, next) => {
   try {
-    const { avatar } = req.body;
-    const { _id } = req.user;
-
-    const user = await userModel.findOne({ _id })
-
-    if (!user) {
-      return res.status(401).json({
+    if (!req.file) {
+      return res.status(400).json({
         success: false,
-        message: "User Not Found",
+        message: "Image is required",
       });
-
     }
 
-    user.avatar = avatar;
-    await user.save();
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "avatars",
+    });
 
+    console.log(result);
+
+
+    await userModel.findByIdAndUpdate(req.user._id, {
+      avatar: result.secure_url,
+    });
 
     res.status(200).json({
       success: true,
-      message: "Avatar updated successfully",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        avatar: user.avatar,
-        role: user.role,
-        address: user.address,
-        isVerified: user.isVerified,
-      },
+      avatar: result.secure_url,
     });
   } catch (error) {
     next(error);

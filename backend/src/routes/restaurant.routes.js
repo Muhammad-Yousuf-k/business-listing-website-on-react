@@ -24,6 +24,9 @@ router.post("/create-restaurant-listing", isLoggedIn, csrfProtection, authorizeR
 router.get("/get-best-restaurant-listing", csrfProtection, getRestaurants);
 /* READ ONE */
 router.get("/get-restaurant-listing/:_id", csrfProtection, getRestaurantById);
+
+
+
 /* Search */
 router.get("/search/", search);
 /* UPDATE */

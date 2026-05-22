@@ -102,20 +102,37 @@ export default function Account() {
   }, [])
 
   const sendAvatarFile = useCallback(async () => {
-    if (!avatarFile) return
+    if (!avatarFile) {
+      toast.error("Please select an image");
+      return;
+    }
 
-    setAvatarLoading(true)
+    setAvatarLoading(true);
 
     try {
-      const form = new FormData()
-      form.append("avatar", avatarFile)
+      const form = new FormData();
 
-      await handleUpdateAvatar(form)
-      setAvatarFile(null)
+      // MUST match upload.single("image")
+      form.append("image", avatarFile);
+
+      const entries = [...form.entries()];
+      console.log(entries);
+
+      await handleUpdateAvatar(form);
+
+      toast.success("Avatar updated successfully");
+
+      setAvatarFile(null);
+    } catch (error) {
+      console.error(error);
+
+      toast.error(
+        error?.response?.data?.message || "Failed to update avatar"
+      );
     } finally {
-      setAvatarLoading(false)
+      setAvatarLoading(false);
     }
-  }, [avatarFile, handleUpdateAvatar])
+  }, [avatarFile, handleUpdateAvatar]);
 
   useEffect(() => {
     return () => {
@@ -141,9 +158,9 @@ export default function Account() {
                 className="group relative h-24 w-24 cursor-pointer"
                 onClick={() => fileRef.current?.click()}
               >
-                {avatarPreview && avatarPreview !== "/unknownuser.png" ? (
+                {user?.avatar && avatarPreview ? (
                   <img
-                    src={avatarPreview}
+                    src={user?.avatar}
                     alt="avatar"
                     loading="lazy"
                     className="h-full w-full rounded-full border-[3px] border-[#F1592A] object-cover"

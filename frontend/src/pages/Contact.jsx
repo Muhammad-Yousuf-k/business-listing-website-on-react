@@ -2,6 +2,7 @@ import { useState } from "react";
 import CommonHeroSec from "../components/CommonHeroSec";
 import Icon from "../components/Icon";
 import { useContent } from "../hooks/useContent";
+import { useUser } from "../hooks/useUser";
 
 const inputClass = (hasError) =>
   `contact-input w-full rounded-[10px] border-[1.5px] px-[14px] py-[10px] text-sm font-[inherit] text-[var(--text-main)] outline-none transition-[border-color,box-shadow] duration-150 focus:border-[var(--primary)] focus:shadow-[0_0_0_3px_rgba(37,99,235,0.1)] ${hasError
@@ -18,12 +19,12 @@ const InfoBlock = ({ icon, label, value, href, color }) => (
   >
     <span
       className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-all duration-200 ${color === "#2563eb"
-          ? "bg-blue-100 text-blue-600"
-          : color === "#22c55e"
-            ? "bg-green-100 text-green-500"
-            : color === "#f59e0b"
-              ? "bg-yellow-100 text-yellow-500"
-              : "bg-red-100 text-red-600"
+        ? "bg-blue-100 text-blue-600"
+        : color === "#22c55e"
+          ? "bg-green-100 text-green-500"
+          : color === "#f59e0b"
+            ? "bg-yellow-100 text-yellow-500"
+            : "bg-red-100 text-red-600"
         }`}
     >
       <Icon name={icon} size={19} />
@@ -59,11 +60,10 @@ export default function ContactPage() {
     subject: "",
     phone: "",
     message: "",
-    to: "",
-    from: "",
   });
 
   const { ContactPagePackage } = useContent();
+  const { handleContactForm } = useUser();
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState("idle");
 
@@ -89,7 +89,7 @@ export default function ContactPage() {
     return e;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const validationErrors = validate();
@@ -100,15 +100,19 @@ export default function ContactPage() {
 
     const payload = {
       ...form,
-      to: ContactPagePackage?.formEmails?.contactForm?.to,
-      from: ContactPagePackage?.formEmails?.contactForm?.from,
     };
 
-    console.log(payload);
+    const res = await handleContactForm(payload);
 
     setErrors({});
     setStatus("loading");
-    setTimeout(() => setStatus("success"), 1800);
+
+    if (res) {
+      setStatus("success")
+    } else {
+      setStatus("idle")
+    }
+
   };
 
   const handleChange = (field, value) => {
@@ -217,10 +221,10 @@ export default function ContactPage() {
                     }
                   >
                     <input
-                      className={inputClass(false)}
-                      value={form.subject}
+                      className={inputClass(!!errors.phone)}
                       placeholder="+1 (555) 000-0000"
-                      type="tel"
+                      value={form.phone}
+                      onChange={(e) => handleChange("phone", e.target.value)}
                     />
                   </Field>
 
@@ -244,8 +248,8 @@ export default function ContactPage() {
                   <div className="sm:col-span-2 flex items-center gap-4 flex-wrap">
                     <button
                       className={`flex items-center gap-2 px-7 py-3 rounded-xl text-sm font-bold text-white bg-[var(--primary)] transition-[background,transform,box-shadow] duration-150 hover:not-disabled:bg-[var(--primary-hover)] hover:not-disabled:-translate-y-px hover:not-disabled:shadow-[0_6px_20px_rgba(37,99,235,0.3)] ${status === "loading"
-                          ? "cursor-not-allowed opacity-80"
-                          : "cursor-pointer"
+                        ? "cursor-not-allowed opacity-80"
+                        : "cursor-pointer"
                         }`}
                       onClick={handleSubmit}
                       disabled={status === "loading"}
@@ -423,8 +427,8 @@ function FAQItem({ q, a }) {
 
         <span
           className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 ${open
-              ? "bg-[var(--primary)] text-white rotate-90"
-              : "bg-[var(--bg-page)] text-[var(--text-muted)] rotate-0"
+            ? "bg-[var(--primary)] text-white rotate-90"
+            : "bg-[var(--bg-page)] text-[var(--text-muted)] rotate-0"
             }`}
         >
           <svg

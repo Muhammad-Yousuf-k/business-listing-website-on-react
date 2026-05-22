@@ -197,7 +197,7 @@ function NavLink({ to, children, onClick }) {
 
 /* ─── Main Header ────────────────────────────────────────────── */
 export default function Header() {
-  const { isLoggedIn, userAvatar } = useUser()
+  const { isLoggedIn, user } = useUser()
   const [menuOpen, setMenuOpen] = useState(false)
   const { pathname } = useLocation()
 
@@ -243,7 +243,7 @@ export default function Header() {
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-3">
             {isLoggedIn ? (
-              <UserMenu img={userAvatar} />
+              <UserMenu img={user?.avatar} />
             ) : (
               <>
                 <ButtonOne title='Login' path="/login" isInverted={true} />
@@ -272,7 +272,7 @@ export default function Header() {
             {/* Avatar row (if logged in) */}
             {isLoggedIn && (
               <div className="mb-3 pb-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                <UserMenu img={userAvatar} />
+                <UserMenu img={user?.avatar} />
               </div>
             )}
 

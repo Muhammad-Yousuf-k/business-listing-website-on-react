@@ -14,6 +14,7 @@ import isLoggedIn from "../middlewares/isLoggedIn.js";
 import csrfProtection from "../middlewares/csrf.middleware.js";
 import { withValidation } from "../middlewares/withValidation.js";
 import { authValidator } from "../validator/auth_form_verify.js";
+import { upload } from "../middlewares/multer.middleware.js";
 
 const router = express.Router();
 
@@ -57,9 +58,11 @@ router.put(
     "/update-avatar",
     csrfProtection,
     isLoggedIn,
-    withValidation(authValidator.updateAvatar),
+    upload.single("image"),
     updateAvatar
 );
+
+
 
 router.get("/checkUser", csrfProtection, isLoggedIn, checkUser);
 

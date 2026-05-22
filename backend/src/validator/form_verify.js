@@ -19,7 +19,7 @@ export const formValidator = {
             .isEmail()
             .withMessage("Invalid email"),
 
-        body("Subject")
+        body("subject")
             .notEmpty()
             .withMessage("Subject is required"),
 

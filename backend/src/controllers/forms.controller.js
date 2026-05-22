@@ -4,9 +4,11 @@ import { sendEmail } from "../utils/sendEmail.js";
 /* CONTACT FORM */
 export const contactForm = async (req, res, next) => {
     try {
-        const { name, email, Subject, Phone, message } = req.body;
+        const { name, email, subject, phone, message } = req.body;
 
-        if (!name || !email || !Subject || !message) {
+        console.log(req.body);
+
+        if (!name || !email || !subject || !message) {
             return res.status(400).json({
                 success: false,
                 message: "All fields are required",
@@ -15,12 +17,12 @@ export const contactForm = async (req, res, next) => {
 
         await sendEmail({
             to: email,
-            subject: Subject,
-            message: `
-                <p><strong>Name:</strong> ${name}</p>
-                <p><strong>Phone:</strong> ${Phone}</p>
+            subject: subject,
+            html: `
+                <p><strong>Name:</strong> ${name || "Not provided"}</p>
+                <p><strong>Phone:</strong> ${phone || "Not provided"}</p>
                 <p><strong>Message:</strong></p>
-                <p>${message}</p>
+                <p>${message || "Not provided"}</p>
             `,
         });
 

@@ -124,16 +124,6 @@ export const listingValidator = {
             .isObject()
             .withMessage("Location must be an object"),
 
-        body("address.location.lat")
-            .optional()
-            .isFloat({ min: -90, max: 90 })
-            .withMessage("Invalid latitude"),
-
-        body("address.location.lng")
-            .optional()
-            .isFloat({ min: -180, max: 180 })
-            .withMessage("Invalid longitude"),
-
         // Working Hours
         body("workingHours")
             .optional()

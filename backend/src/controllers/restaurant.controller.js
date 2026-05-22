@@ -1,5 +1,5 @@
 import { RestaurantModel } from "../models/restaurant.model.js";
-import {ReviewModel} from "../models/review.model.js";
+import { ReviewModel } from "../models/review.model.js";
 import { MenuItemsModel } from "../models/menu_item.model.js";
 import slugify from "slugify";
 
@@ -63,6 +63,8 @@ export const getRestaurants = async (req, res, next) => {
             .sort({ priorityScore: -1 })
             .limit(8)
             .lean();
+
+            console.log("restaurants", restaurants);
 
         res.json({
             success: true,

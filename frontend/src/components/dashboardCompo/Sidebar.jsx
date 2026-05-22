@@ -59,31 +59,25 @@ const AssignTasksIcon = () => (
 const Sidebar = ({ isOpen, onClose }) => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { logout, user, userRole, userAvatar } = useUser()
+  const { logout, user } = useUser()
 
   // ── Menu config ──
   let menuItems = []
-  if (userRole === "admin") {
+  if (user?.role === "admin") {
     menuItems = [
       { label: "Dashboard", path: "/admin/dashboard", icon: <DashboardIcon /> },
       { label: "Listing Management", path: "/admin/listing-management", icon: <AssignIcon /> },
       { label: "Listing For Approval", path: "/admin/listing-for-approval", icon: <AssignTasksIcon /> },
-      { label: "Events", path: "/admin/events", icon: <AssignTasksIcon /> },
-      { label: "Settings", path: "/admin/setting", icon: <SettingsIcon /> },
+      { label: "Set Events", path: "/admin/events", icon: <AssignTasksIcon /> },
     ]
-  } else if (userRole === "owner") {
+  } else if (user?.role === "owner") {
     menuItems = [
       { label: "Dashboard", path: "/owner/dashboard", icon: <DashboardIcon /> },
       { label: "Listing Management", path: "/owner/listing-management", icon: <AssignIcon /> },
-      { label: "Settings", path: "/owner/setting", icon: <SettingsIcon /> },
     ]
   }
 
 
-
-  const initials = user?.name
-    ? user.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
-    : "U"
 
   const handleNav = (path) => {
     navigate(path)
@@ -193,7 +187,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             )
           })}
           {/* renew reminder */}
-          {userRole === "owner" && (
+          {user?.role === "owner" && (
             <div className="box w-full rounded h-50 border border-(--border-default) flex flex-col justify-center p-5 bg-[#F3F4F6]">
               <DashboardIcon />
               <h2 className="font-bold text-[16px]">Plan about to expire</h2>
@@ -217,7 +211,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
               style={{ backgroundColor: "var(--primary)" }}
             >
-              <img src={userAvatar} alt="" />
+              <img src={user?.avatar} alt="" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold truncate uppercase" style={{ color: "var(--text-main)" }}>
